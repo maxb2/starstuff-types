@@ -31,8 +31,8 @@ struct HMSAngle {
 
 impl DMSAngle {
     pub fn from_decimal(dec_angle: f64) -> Self {
-        let (deg, min) = div_rem(dec_angle, 1.0);
-        let (min, sec) = div_rem(min, 60.0);
+        let (deg, deg_remainder) = div_rem(dec_angle, 1.0);
+        let (min, min_remainder) = div_rem(deg_remainder * 60.0, 1.0);
         Self {
             sign: if dec_angle.is_sign_positive() {
                 1_i8
@@ -41,7 +41,7 @@ impl DMSAngle {
             },
             degree: deg as u32,
             minute: min as u32,
-            second: sec,
+            second: min_remainder * 60.0,
         }
     }
 
@@ -64,8 +64,8 @@ impl DMSAngle {
 
 impl HMSAngle {
     pub fn from_decimal(dec_hour: f64) -> Self {
-        let (hour, min) = div_rem(dec_hour, 1.0);
-        let (min, sec) = div_rem(min, 60.0);
+        let (hour, hour_remainder) = div_rem(dec_hour, 1.0);
+        let (min, min_remainder) = div_rem(hour_remainder * 60.0, 1.0);
         Self {
             sign: if dec_hour.is_sign_positive() {
                 1_i8
@@ -74,7 +74,7 @@ impl HMSAngle {
             },
             hour: hour as u32,
             minute: min as u32,
-            second: sec,
+            second: min_remainder * 60.0,
         }
     }
 
@@ -133,6 +133,15 @@ mod tests {
         assert_eq!(
             DMSAngle {
                 sign: 1_i8,
+                degree: 10_u32,
+                minute: 10_u32,
+                second: 10.0
+            },
+            DMSAngle::from_decimal(10.0 + 10.0 / 60.0 + 10.0 / 3600.0)
+        );
+        assert_eq!(
+            DMSAngle {
+                sign: 1_i8,
                 degree: 180_u32,
                 minute: 0_u32,
                 second: 0.0
@@ -169,6 +178,15 @@ mod tests {
                 second: 0.0
             },
             HMSAngle::from_decimal(12.0)
+        );
+        assert_eq!(
+            HMSAngle {
+                sign: 1_i8,
+                hour: 10_u32,
+                minute: 10_u32,
+                second: 10.0
+            },
+            HMSAngle::from_decimal(10.0 + 10.0 / 60.0 + 10.0 / 3600.0)
         );
         assert_eq!(
             HMSAngle {
