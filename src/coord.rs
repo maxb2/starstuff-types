@@ -1,4 +1,4 @@
-use crate::angle::{Angle, AngleTrig, Degree, Hour, Radian, PI, PI_FOURTH, PI_HALF, TWO_PI};
+use crate::angle::{Angle, AngleTrig, Hour, Radian, PI, PI_FOURTH, PI_HALF};
 use crate::util::GMST;
 
 pub trait ConstrainedAngle {
@@ -79,6 +79,7 @@ pub struct Azimuth(pub Angle);
 pub struct Longitude(pub Angle);
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Cartesian {
     x: f64,
     y: f64,
@@ -92,6 +93,7 @@ pub struct Geographic {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Polar {
     radius: f64,
     angle: Angle,

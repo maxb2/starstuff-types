@@ -1,7 +1,8 @@
-use crate::angle::{Angle, Degree, Hour, Radian, TWO_PI};
+use crate::angle::{Hour, Radian, TWO_PI};
 
 pub use chrono::prelude::*;
 
+#[allow(clippy::excessive_precision)] // actual equation has that much precision
 pub fn earth_rotation_angle(time_julian_ut1: JulianDate) -> Radian {
     // https://en.wikipedia.org/wiki/Sidereal_time
 

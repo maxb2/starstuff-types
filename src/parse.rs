@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Result;
 use std::fs;
 
-use crate::angle::{Angle, ArcMinuteSecond, Degree, Dms, Hms, Hour, Radian, Sign};
+use crate::angle::{Angle, ArcMinuteSecond, Degree, Dms, Hms, Hour, Sign};
 use crate::coord::{Declination, Equitorial, RightAscension};
 use crate::star::{Star, StarCoordinates};
 
