@@ -52,16 +52,10 @@ struct _Catalog {
 }
 
 pub fn parse_catalog(file_path: &String) -> Vec<Star> {
-    println!("In file {}", file_path);
-
     let contents: String =
         fs::read_to_string(file_path).expect("Should have been able to read the file");
 
-    // println!("With text:\n{contents}");
-
     let catalog: _Catalog = serde_json::from_str(&contents).unwrap();
-
-    println!("{:?}, {:#?}", catalog.catalog, catalog.stars[0]);
 
     let mut stars: Vec<Star> = Vec::new();
 
