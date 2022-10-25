@@ -1,6 +1,19 @@
-use std::f64::consts::PI;
+use auto_ops::*;
+
+pub use std::f64::consts::PI;
 
 pub const TWO_PI: f64 = 2.0 * PI;
+pub const PI_HALF: f64 = PI / 2.0;
+pub const PI_FOURTH: f64 = PI / 4.0;
+
+pub trait AngleTrig {
+    fn sin(&self) -> f64;
+    fn asin(&self) -> f64;
+    fn cos(&self) -> f64;
+    fn acos(&self) -> f64;
+    // self.atan2(other) => atan2(self, other) => atan(self/other)
+    fn atan2(&self, other: &Self) -> f64;
+}
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Degree(pub f64);
@@ -10,6 +23,86 @@ pub struct Radian(pub f64);
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Hour(pub f64);
+
+impl_op_ex!(+ |a: &Degree, b: &Degree| -> Degree { Degree(a.0 + b.0) });
+impl_op_ex!(+ |a: &Hour, b: &Hour| -> Hour { Hour(a.0 + b.0) });
+impl_op_ex!(+ |a: &Radian, b: &Radian| -> Radian { Radian(a.0 + b.0) });
+
+impl_op_ex!(-|a: &Degree, b: &Degree| -> Degree { Degree(a.0 - b.0) });
+impl_op_ex!(-|a: &Hour, b: &Hour| -> Hour { Hour(a.0 - b.0) });
+impl_op_ex!(-|a: &Radian, b: &Radian| -> Radian { Radian(a.0 - b.0) });
+
+impl AngleTrig for Radian {
+    fn sin(&self) -> f64 {
+        self.0.sin()
+    }
+    fn asin(&self) -> f64 {
+        self.0.sin()
+    }
+    fn cos(&self) -> f64 {
+        self.0.cos()
+    }
+    fn acos(&self) -> f64 {
+        self.0.acos()
+    }
+    fn atan2(&self, other: &Self) -> f64 {
+        self.0.atan2(other.0)
+    }
+}
+
+impl AngleTrig for Degree {
+    fn sin(&self) -> f64 {
+        Radian::from(*self).sin()
+    }
+    fn asin(&self) -> f64 {
+        Radian::from(*self).sin()
+    }
+    fn cos(&self) -> f64 {
+        Radian::from(*self).cos()
+    }
+    fn acos(&self) -> f64 {
+        Radian::from(*self).acos()
+    }
+    fn atan2(&self, other: &Self) -> f64 {
+        Radian::from(*self).atan2(&Radian::from(*other))
+    }
+}
+
+impl AngleTrig for Hour {
+    fn sin(&self) -> f64 {
+        Radian::from(*self).sin()
+    }
+    fn asin(&self) -> f64 {
+        Radian::from(*self).sin()
+    }
+    fn cos(&self) -> f64 {
+        Radian::from(*self).cos()
+    }
+    fn acos(&self) -> f64 {
+        Radian::from(*self).acos()
+    }
+    fn atan2(&self, other: &Self) -> f64 {
+        Radian::from(*self).atan2(&Radian::from(*other))
+    }
+}
+
+impl AngleTrig for Angle {
+    fn sin(&self) -> f64 {
+        Radian::from(*self).sin()
+    }
+    fn asin(&self) -> f64 {
+        Radian::from(*self).sin()
+    }
+    fn cos(&self) -> f64 {
+        Radian::from(*self).cos()
+    }
+    fn acos(&self) -> f64 {
+        Radian::from(*self).acos()
+    }
+    fn atan2(&self, other: &Self) -> f64 {
+        Radian::from(*self).atan2(&Radian::from(*other))
+    }
+}
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Angle {
@@ -201,6 +294,28 @@ impl From<Radian> for Hms {
 impl From<Hour> for Hms {
     fn from(angle: Hour) -> Self {
         Self::angle_to_ams(angle.0)
+    }
+}
+
+// TODO: DRY this somehow.
+
+impl From<Hms> for Hour {
+    fn from(angle: Hms) -> Hour {
+        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
+        match angle.0 {
+            Sign::Plus => Hour(angle_abs),
+            Sign::Minus => Hour(-angle_abs),
+        }
+    }
+}
+
+impl From<Dms> for Degree {
+    fn from(angle: Dms) -> Degree {
+        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
+        match angle.0 {
+            Sign::Plus => Degree(angle_abs),
+            Sign::Minus => Degree(-angle_abs),
+        }
     }
 }
 

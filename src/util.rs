@@ -42,6 +42,16 @@ where
     }
 }
 
+// Greenwich Mean Sidereal Time
+pub struct GMST(pub Hour);
+
+impl From<JulianDate> for GMST {
+    fn from(julian_date: JulianDate) -> Self {
+        // https://en.wikipedia.org/wiki/Sidereal_time
+        Self(Hour::from(earth_rotation_angle(julian_date)))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::util::*;
