@@ -5,12 +5,6 @@ use starmap_rs::star::StarCoordinates;
 use starmap_rs::util::*;
 
 fn main() {
-    println!("Hello, world!");
-    println!(
-        "{:?}",
-        JulianDate::from(Local.ymd(2000, 1, 1).and_hms(12, 0, 0))
-    );
-
     let mut stars = parse_catalog(&String::from("./catalog.json"));
 
     println!("{:?}", &stars[0]);
