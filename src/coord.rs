@@ -6,8 +6,8 @@ pub trait ConstrainedAngle {
     fn value(&self) -> Angle;
 }
 
-#[derive(Debug)]
-pub struct ZenithAngle(Angle);
+#[derive(Debug, Copy, Clone)]
+pub struct ZenithAngle(pub Angle);
 
 impl ConstrainedAngle for ZenithAngle {
     fn new(angle: &Angle) -> Self {
@@ -22,7 +22,7 @@ impl ConstrainedAngle for ZenithAngle {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Declination(pub Angle);
 
 impl ConstrainedAngle for Declination {
@@ -38,7 +38,7 @@ impl ConstrainedAngle for Declination {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Altitude(pub Angle);
 
 impl ConstrainedAngle for Altitude {
@@ -53,8 +53,8 @@ impl ConstrainedAngle for Altitude {
         self.0
     }
 }
-#[derive(Debug)]
-pub struct Latitude(Angle);
+#[derive(Debug, Copy, Clone)]
+pub struct Latitude(pub Angle);
 
 impl ConstrainedAngle for Latitude {
     fn new(angle: &Angle) -> Self {
@@ -69,46 +69,46 @@ impl ConstrainedAngle for Latitude {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct RightAscension(pub Angle);
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Azimuth(pub Angle);
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Longitude(pub Angle);
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[allow(dead_code)]
 pub struct Cartesian {
-    x: f64,
-    y: f64,
-    z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Geographic {
-    latitude: Latitude,
-    longitude: Longitude,
+    pub latitude: Latitude,
+    pub longitude: Longitude,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[allow(dead_code)]
 pub struct Polar {
-    radius: f64,
-    angle: Angle,
+    pub radius: f64,
+    pub angle: Angle,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Equitorial {
     pub right_ascension: RightAscension,
     pub declination: Declination,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Horizontal {
-    altitude: Altitude,
-    azimuth: Azimuth,
+    pub altitude: Altitude,
+    pub azimuth: Azimuth,
 }
 
 impl Horizontal {
