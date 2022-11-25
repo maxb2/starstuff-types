@@ -1,8 +1,8 @@
-use starmap_rs::angle::{Angle, Degree};
-use starmap_rs::coord::{Equitorial, Geographic, Horizontal, Latitude, Longitude};
-use starmap_rs::parse::parse_catalog;
-use starmap_rs::star::StarCoordinates;
-use starmap_rs::util::*;
+use starmap::angle::{Angle, Degree};
+use starmap::coord::{Equitorial, Geographic, Horizontal, Latitude, Longitude};
+use starmap::parse::parse_catalog;
+use starmap::star::StarCoordinates;
+use starmap::util::*;
 
 fn main() {
     let mut stars = parse_catalog(&String::from("./catalog.json"));
