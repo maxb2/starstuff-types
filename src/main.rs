@@ -14,7 +14,9 @@ fn main() {
         longitude: Longitude(Angle::from(Degree(0.0))),
     };
 
-    let sidereal_time: GMST = GMST::from(JulianDate::from(Local.ymd(2000, 1, 1).and_hms(12, 0, 0)));
+    let sidereal_time: GMST = GMST::from(JulianDate::from(
+        Local.with_ymd_and_hms(2000, 1, 1, 12, 0, 0).unwrap(),
+    ));
 
     for star in &mut stars {
         let horiz_coord = StarCoordinates::Stereo(
