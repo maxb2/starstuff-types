@@ -2,6 +2,7 @@ use crate::angle::*;
 pub mod angle;
 pub mod coord;
 pub mod parse;
+pub mod parse_hip;
 pub mod parse_yale;
 pub mod star;
 pub mod util;
