@@ -1,4 +1,4 @@
-use starmap::angle::{Angle, Degree};
+use starmap::angle::{Angle, DegData};
 use starmap::coord::{Equitorial, Geographic, Horizontal, Latitude, Longitude};
 use starmap::parse::parse_catalog;
 use starmap::star::StarCoordinates;
@@ -10,8 +10,8 @@ fn main() {
     println!("{:?}", &stars[0]);
 
     let geo = Geographic {
-        latitude: Latitude(Angle::from(Degree(0.0))),
-        longitude: Longitude(Angle::from(Degree(0.0))),
+        latitude: Latitude(Angle::from(DegData(0.0))),
+        longitude: Longitude(Angle::from(DegData(0.0))),
     };
 
     let sidereal_time: GMST = GMST::from(JulianDate::from(

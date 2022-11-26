@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 
-use crate::angle::{Angle, ArcMinuteSecond, Degree, Dms, Hms, Hour, Sign};
+use crate::angle::{Angle, ArcMinuteSecond, DegData, Dms, Hms, HourData, Sign};
 use crate::coord::{Declination, Equitorial, RightAscension};
 use crate::star::{Star, StarCoordinates};
 
@@ -65,10 +65,10 @@ pub fn parse_catalog(file_path: &String) -> Vec<Star> {
             v_mag: _star.v_mag,
             name: _star.name,
             coordinates: StarCoordinates::Equitorial(Equitorial {
-                right_ascension: RightAscension(Angle::from(Hour::from(Hms::from(
+                right_ascension: RightAscension(Angle::from(HourData::from(Hms::from(
                     _star.right_ascension,
                 )))),
-                declination: Declination(Angle::from(Degree::from(Dms::from(_star.declination)))),
+                declination: Declination(Angle::from(DegData::from(Dms::from(_star.declination)))),
             }),
         })
     }

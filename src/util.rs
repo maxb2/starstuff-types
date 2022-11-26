@@ -1,12 +1,12 @@
-use crate::angle::{Hour, Radian, TWO_PI};
+use crate::angle::{HourData, RadData, TWO_PI};
 
 pub use chrono::prelude::*;
 
 #[allow(clippy::excessive_precision)] // actual equation has that much precision
-pub fn earth_rotation_angle(time_julian_ut1: JulianDate) -> Radian {
+pub fn earth_rotation_angle(time_julian_ut1: JulianDate) -> RadData {
     // https://en.wikipedia.org/wiki/Sidereal_time
 
-    Radian(TWO_PI * (0.7790572732640 + 1.00273781191135448 * (time_julian_ut1.0 - 2451545.0)))
+    RadData(TWO_PI * (0.7790572732640 + 1.00273781191135448 * (time_julian_ut1.0 - 2451545.0)))
 }
 
 #[derive(Debug)]
@@ -44,12 +44,12 @@ where
 }
 
 // Greenwich Mean Sidereal Time
-pub struct GMST(pub Hour);
+pub struct GMST(pub HourData);
 
 impl From<JulianDate> for GMST {
     fn from(julian_date: JulianDate) -> Self {
         // https://en.wikipedia.org/wiki/Sidereal_time
-        Self(Hour::from(earth_rotation_angle(julian_date)))
+        Self(HourData::from(earth_rotation_angle(julian_date)))
     }
 }
 

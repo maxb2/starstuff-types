@@ -1,7 +1,7 @@
 // Hipparcos Catalog parser
 // https://heasarc.gsfc.nasa.gov/W3Browse/all/hipparcos.html
 
-use crate::angle::{Angle, ArcMinuteSecond, Degree, Dms, Hms, Hour, Sign};
+use crate::angle::{Angle, ArcMinuteSecond, DegData, Dms, Hms, Sign};
 use crate::coord::{Declination, RightAscension};
 
 use std::convert::TryFrom;
@@ -30,13 +30,13 @@ macro_rules! parse_hip_field {
 
     (ra_deg $s:expr) => {
         match parse_hip_field!(f64 $s) {
-            Some(deg) => Some(RightAscension(Angle::from(Degree(deg)))),
+            Some(deg) => Some(RightAscension(Angle::from(DegData(deg)))),
             None => None
         }
     };
     (dec_deg $s:expr) => {
         match parse_hip_field!(f64 $s) {
-            Some(deg) => Some(Declination(Angle::from(Degree(deg)))),
+            Some(deg) => Some(Declination(Angle::from(DegData(deg)))),
             None => None
         }
     };

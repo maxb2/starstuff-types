@@ -8,9 +8,9 @@ pub mod star;
 pub mod util;
 
 pub fn stuff() {
-    let _rad: Radian = Radian(1.0);
-    let _hr: Hour = Hour(1.0);
-    let _deg: Degree = Degree(1.0);
+    let _rad: RadData = RadData(1.0);
+    let _hr: HourData = HourData(1.0);
+    let _deg: DegData = DegData(1.0);
 }
 
 #[cfg(test)]
