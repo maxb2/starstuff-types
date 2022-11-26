@@ -319,6 +319,18 @@ impl From<Dms> for Degree {
     }
 }
 
+impl From<Dms> for Angle {
+    fn from(dms: Dms) -> Angle {
+        Angle::from(Degree::from(dms))
+    }
+}
+
+impl From<Hms> for Angle {
+    fn from(hms: Hms) -> Angle {
+        Angle::from(Hour::from(hms))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::angle::*;
