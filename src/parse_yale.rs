@@ -2,17 +2,23 @@
 // http://tdc-www.harvard.edu/catalogs/bsc5.html
 // NOTE: put the `catalog` file at the root of this repository for the tests to pass.
 
-use std::option::Option;
-use std::str::FromStr;
-
-fn parse_optional_field<T>(s: String) -> Option<T>
-where
-    T: FromStr,
-{
-    match s.parse::<T>() {
-        Ok(u) => Some(u),
-        Err(_) => None,
-    }
+macro_rules! parse_yale_field {
+    (usize $s:expr) => {
+        // Need to trim because numbers are space padded in YBSC
+        match $s.trim().parse::<usize>() {
+            Ok(inner) => Some(inner),
+            Err(_) => None,
+        }
+    };
+    (f64 $s:expr) => {
+        match $s.trim().parse::<f64>() {
+            Ok(inner) => Some(inner),
+            Err(_) => None,
+        }
+    };
+    (String $s:expr) => {
+        $s.to_string()
+    };
 }
 
 #[allow(non_snake_case, dead_code)]
@@ -78,59 +84,59 @@ impl From<String> for YaleStar {
         let ss = &s[37..41];
         println!("{}", ss.trim());
         YaleStar {
-            HR: s[0..4].trim().parse().unwrap(),
-            Name: s[4..14].parse().unwrap(),
-            DM: s[14..25].parse().unwrap(),
-            HD: parse_optional_field::<usize>(s[25..31].trim().to_string()),
-            SAO: parse_optional_field::<usize>(s[31..37].trim().to_string()),
-            FK5: parse_optional_field::<usize>(s[37..41].to_string()),
-            IRflag: s[41..42].parse().unwrap(),
-            r_IRflag: s[42..43].parse().unwrap(),
-            Multiple: s[43..44].parse().unwrap(),
-            ADS: s[44..49].parse().unwrap(),
-            ADScomp: s[49..51].parse().unwrap(),
-            VarID: s[51..60].parse().unwrap(),
-            RAh1900: parse_optional_field::<usize>(s[60..62].trim().to_string()),
-            RAm1900: parse_optional_field::<usize>(s[62..64].trim().to_string()),
-            RAs1900: parse_optional_field::<f64>(s[64..68].trim().to_string()),
-            DE_1900: s[68..69].parse().unwrap(),
-            DEd1900: parse_optional_field::<usize>(s[69..71].trim().to_string()),
-            DEm1900: parse_optional_field::<usize>(s[71..73].trim().to_string()),
-            DEs1900: parse_optional_field::<usize>(s[73..75].trim().to_string()),
-            RAh: parse_optional_field::<usize>(s[75..77].trim().to_string()),
-            RAm: parse_optional_field::<usize>(s[77..79].trim().to_string()),
-            RAs: parse_optional_field::<f64>(s[79..83].trim().to_string()),
-            DE_: s[83..84].parse().unwrap(),
-            DEd: parse_optional_field::<usize>(s[84..86].trim().to_string()),
-            DEm: parse_optional_field::<usize>(s[86..88].trim().to_string()),
-            DEs: parse_optional_field::<usize>(s[88..90].trim().to_string()),
-            GLON: parse_optional_field::<f64>(s[90..96].trim().to_string()),
-            GLAT: parse_optional_field::<f64>(s[96..102].trim().to_string()),
-            Vmag: parse_optional_field::<f64>(s[102..107].trim().to_string()),
-            n_Vmag: s[107..108].parse().unwrap(),
-            u_Vmag: s[108..109].parse().unwrap(),
-            B_V: parse_optional_field::<f64>(s[109..114].trim().to_string()),
-            u_B_V: s[114..115].parse().unwrap(),
-            U_B: parse_optional_field::<f64>(s[115..120].trim().to_string()),
-            u_U_B: s[120..121].parse().unwrap(),
-            R_I: parse_optional_field::<f64>(s[121..126].trim().to_string()),
-            n_R_I: s[126..127].parse().unwrap(),
-            SpType: s[127..147].parse().unwrap(),
-            n_SpType: s[147..148].parse().unwrap(),
-            pmRA: parse_optional_field::<f64>(s[148..154].trim().to_string()),
-            pmDe: parse_optional_field::<f64>(s[154..160].trim().to_string()),
-            n_Parallax: s[160..161].parse().unwrap(),
-            Parallax: parse_optional_field::<f64>(s[161..166].trim().to_string()),
-            RadVel: parse_optional_field::<usize>(s[166..170].trim().to_string()),
-            n_RadVel: s[170..174].parse().unwrap(),
-            l_RotVel: s[174..176].parse().unwrap(),
-            RotVel: parse_optional_field::<usize>(s[176..179].trim().to_string()),
-            u_RotVel: s[179..180].parse().unwrap(),
-            Dmag: parse_optional_field::<f64>(s[180..184].trim().to_string()),
-            Sep: parse_optional_field::<f64>(s[184..190].trim().to_string()),
-            MultID: s[190..194].parse().unwrap(),
-            MultCnt: parse_optional_field::<usize>(s[194..196].trim().to_string()),
-            NoteFlag: s[196..197].parse().unwrap(),
+            HR: parse_yale_field!(usize s[0..4]).unwrap(),
+            Name: parse_yale_field!(String s[4..14]),
+            DM: parse_yale_field!(String s[14..25]),
+            HD: parse_yale_field!(usize s[25..31]),
+            SAO: parse_yale_field!(usize s[31..37]),
+            FK5: parse_yale_field!(usize s[37..41]),
+            IRflag: parse_yale_field!(String s[41..42]),
+            r_IRflag: parse_yale_field!(String s[42..43]),
+            Multiple: parse_yale_field!(String s[43..44]),
+            ADS: parse_yale_field!(String s[44..49]),
+            ADScomp: parse_yale_field!(String s[49..51]),
+            VarID: parse_yale_field!(String s[51..60]),
+            RAh1900: parse_yale_field!(usize s[60..62]),
+            RAm1900: parse_yale_field!(usize s[62..64]),
+            RAs1900: parse_yale_field!(f64 s[64..68]),
+            DE_1900: parse_yale_field!(String s[68..69]),
+            DEd1900: parse_yale_field!(usize s[69..71]),
+            DEm1900: parse_yale_field!(usize s[71..73]),
+            DEs1900: parse_yale_field!(usize s[73..75]),
+            RAh: parse_yale_field!(usize s[75..77]),
+            RAm: parse_yale_field!(usize s[77..79]),
+            RAs: parse_yale_field!(f64 s[79..83]),
+            DE_: parse_yale_field!(String s[83..84]),
+            DEd: parse_yale_field!(usize s[84..86]),
+            DEm: parse_yale_field!(usize s[86..88]),
+            DEs: parse_yale_field!(usize s[88..90]),
+            GLON: parse_yale_field!(f64 s[90..96]),
+            GLAT: parse_yale_field!(f64 s[96..102]),
+            Vmag: parse_yale_field!(f64 s[102..107]),
+            n_Vmag: parse_yale_field!(String s[107..108]),
+            u_Vmag: parse_yale_field!(String s[108..109]),
+            B_V: parse_yale_field!(f64 s[109..114]),
+            u_B_V: parse_yale_field!(String s[114..115]),
+            U_B: parse_yale_field!(f64 s[115..120]),
+            u_U_B: parse_yale_field!(String s[120..121]),
+            R_I: parse_yale_field!(f64 s[121..126]),
+            n_R_I: parse_yale_field!(String s[126..127]),
+            SpType: parse_yale_field!(String s[127..147]),
+            n_SpType: parse_yale_field!(String s[147..148]),
+            pmRA: parse_yale_field!(f64 s[148..154]),
+            pmDe: parse_yale_field!(f64 s[154..160]),
+            n_Parallax: parse_yale_field!(String s[160..161]),
+            Parallax: parse_yale_field!(f64 s[161..166]),
+            RadVel: parse_yale_field!(usize s[166..170]),
+            n_RadVel: parse_yale_field!(String s[170..174]),
+            l_RotVel: parse_yale_field!(String s[174..176]),
+            RotVel: parse_yale_field!(usize s[176..179]),
+            u_RotVel: parse_yale_field!(String s[179..180]),
+            Dmag: parse_yale_field!(f64 s[180..184]),
+            Sep: parse_yale_field!(f64 s[184..190]),
+            MultID: parse_yale_field!(String s[190..194]),
+            MultCnt: parse_yale_field!(usize s[194..196]),
+            NoteFlag: parse_yale_field!(String s[196..197]),
         }
     }
 }
