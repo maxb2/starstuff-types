@@ -1,4 +1,4 @@
-use crate::angle::{Angle, AngleTrig, HourData, RadData, PI, PI_FOURTH, PI_HALF};
+use crate::angle::{Angle, PI, PI_FOURTH, PI_HALF};
 use crate::util::GMST;
 
 pub trait ConstrainedAngle {
@@ -11,8 +11,8 @@ pub struct ZenithAngle(pub Angle);
 
 impl ConstrainedAngle for ZenithAngle {
     fn new(angle: &Angle) -> Self {
-        let rad = RadData::from(*angle);
-        if rad.0 < 0.0 || rad.0 > PI {
+        let rad = angle.to_rad();
+        if !(0.0..=PI).contains(&rad) {
             panic!("ZenithAngle must be between 0 and pi!")
         }
         Self(*angle)
@@ -27,8 +27,8 @@ pub struct Declination(pub Angle);
 
 impl ConstrainedAngle for Declination {
     fn new(angle: &Angle) -> Self {
-        let rad = RadData::from(*angle);
-        if rad.0 < -PI_HALF || rad.0 > PI_HALF {
+        let rad = angle.to_rad();
+        if !(-PI_HALF..=PI_HALF).contains(&rad) {
             panic!("Declination must be between -pi/2 and pi/2!")
         }
         Self(*angle)
@@ -43,8 +43,8 @@ pub struct Altitude(pub Angle);
 
 impl ConstrainedAngle for Altitude {
     fn new(angle: &Angle) -> Self {
-        let rad: RadData = RadData::from(*angle);
-        if rad.0 < -PI_HALF || rad.0 > PI_HALF {
+        let rad = angle.to_rad();
+        if !(-PI_HALF..=PI_HALF).contains(&rad) {
             panic!("Altitude must be between -pi/2 and pi/2!")
         }
         Self(*angle)
@@ -58,8 +58,8 @@ pub struct Latitude(pub Angle);
 
 impl ConstrainedAngle for Latitude {
     fn new(angle: &Angle) -> Self {
-        let rad = RadData::from(*angle);
-        if rad.0 < -PI_HALF || rad.0 > PI_HALF {
+        let rad = angle.to_rad();
+        if !(-PI_HALF..=PI_HALF).contains(&rad) {
             panic!("Latitude must be between -pi/2 and pi/2!")
         }
         Self(*angle)
@@ -113,26 +113,25 @@ pub struct Horizontal {
 
 impl Horizontal {
     pub fn from_equitorial(eq: &Equitorial, geo: &Geographic, sidereal_time: &GMST) -> Self {
-        let hour_local: HourData = sidereal_time.0 + HourData::from(geo.longitude.0)
-            - HourData::from(eq.right_ascension.0);
+        let hour_local: Angle = sidereal_time.0 + geo.longitude.0 - eq.right_ascension.0;
         let x_horiz: f64 = -(geo.latitude.0.sin()) * (eq.declination.0.cos()) * (hour_local.cos())
             + geo.latitude.0.cos() * (eq.declination.0.sin());
         let y_horiz: f64 = eq.declination.0.cos() * hour_local.sin();
-        let azimuth_rad: RadData = RadData(-(y_horiz.atan2(x_horiz)));
-        let altitude_rad: RadData = RadData(
+        let azimuth_rad: Angle = Angle::Radian(-(y_horiz.atan2(x_horiz)));
+        let altitude_rad: Angle = Angle::Radian(
             (geo.latitude.0.sin() * eq.declination.0.sin()
                 + geo.latitude.0.cos() * eq.declination.0.cos() * hour_local.cos())
             .asin(),
         );
         Self {
-            altitude: Altitude(Angle::from(azimuth_rad)),
-            azimuth: Azimuth(Angle::from(altitude_rad)),
+            altitude: Altitude(azimuth_rad),
+            azimuth: Azimuth(altitude_rad),
         }
     }
 
     pub fn stereo_project(&self) -> Polar {
         Polar {
-            radius: 2.0 * (PI_FOURTH - RadData::from(self.altitude.0).0 / 2.0).tan(),
+            radius: 2.0 * (PI_FOURTH - self.altitude.0.to_rad() / 2.0).tan(),
             angle: self.azimuth.0,
         }
     }

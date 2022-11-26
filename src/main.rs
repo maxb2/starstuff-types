@@ -1,17 +1,17 @@
-use starmap::angle::{Angle, DegData};
+use starmap::angle::Angle;
 use starmap::coord::{Equitorial, Geographic, Horizontal, Latitude, Longitude};
-use starmap::parse::parse_catalog;
-use starmap::star::StarCoordinates;
+use starmap::star::{Star, StarCoordinates};
 use starmap::util::*;
 
 fn main() {
-    let mut stars = parse_catalog(&String::from("./catalog.json"));
+    // let mut stars = parse_catalog(&String::from("./catalog.json"));
+    let mut stars: Vec<Star> = [].to_vec();
 
     println!("{:?}", &stars[0]);
 
     let geo = Geographic {
-        latitude: Latitude(Angle::from(DegData(0.0))),
-        longitude: Longitude(Angle::from(DegData(0.0))),
+        latitude: Latitude(Angle::Degree(0.0)),
+        longitude: Longitude(Angle::Degree(0.0)),
     };
 
     let sidereal_time: GMST = GMST::from(JulianDate::from(

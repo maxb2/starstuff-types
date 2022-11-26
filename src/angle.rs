@@ -6,200 +6,71 @@ pub const TWO_PI: f64 = 2.0 * PI;
 pub const PI_HALF: f64 = PI / 2.0;
 pub const PI_FOURTH: f64 = PI / 4.0;
 
-pub trait AngleTrig {
-    fn sin(&self) -> f64;
-    fn asin(&self) -> f64;
-    fn cos(&self) -> f64;
-    fn acos(&self) -> f64;
-    // self.atan2(other) => atan2(self, other) => atan(self/other)
-    fn atan2(&self, other: &Self) -> f64;
-}
-
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub struct DegData(pub f64);
-
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub struct RadData(pub f64);
-
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub struct HourData(pub f64);
-
-impl_op_ex!(+ |a: &DegData, b: &DegData| -> DegData { DegData(a.0 + b.0) });
-impl_op_ex!(+ |a: &HourData, b: &HourData| -> HourData { HourData(a.0 + b.0) });
-impl_op_ex!(+ |a: &RadData, b: &RadData| -> RadData { RadData(a.0 + b.0) });
-
-impl_op_ex!(-|a: &DegData, b: &DegData| -> DegData { DegData(a.0 - b.0) });
-impl_op_ex!(-|a: &HourData, b: &HourData| -> HourData { HourData(a.0 - b.0) });
-impl_op_ex!(-|a: &RadData, b: &RadData| -> RadData { RadData(a.0 - b.0) });
-
-impl AngleTrig for RadData {
-    fn sin(&self) -> f64 {
-        self.0.sin()
-    }
-    fn asin(&self) -> f64 {
-        self.0.sin()
-    }
-    fn cos(&self) -> f64 {
-        self.0.cos()
-    }
-    fn acos(&self) -> f64 {
-        self.0.acos()
-    }
-    fn atan2(&self, other: &Self) -> f64 {
-        self.0.atan2(other.0)
-    }
-}
-
-impl AngleTrig for DegData {
-    fn sin(&self) -> f64 {
-        RadData::from(*self).sin()
-    }
-    fn asin(&self) -> f64 {
-        RadData::from(*self).sin()
-    }
-    fn cos(&self) -> f64 {
-        RadData::from(*self).cos()
-    }
-    fn acos(&self) -> f64 {
-        RadData::from(*self).acos()
-    }
-    fn atan2(&self, other: &Self) -> f64 {
-        RadData::from(*self).atan2(&RadData::from(*other))
-    }
-}
-
-impl AngleTrig for HourData {
-    fn sin(&self) -> f64 {
-        RadData::from(*self).sin()
-    }
-    fn asin(&self) -> f64 {
-        RadData::from(*self).sin()
-    }
-    fn cos(&self) -> f64 {
-        RadData::from(*self).cos()
-    }
-    fn acos(&self) -> f64 {
-        RadData::from(*self).acos()
-    }
-    fn atan2(&self, other: &Self) -> f64 {
-        RadData::from(*self).atan2(&RadData::from(*other))
-    }
-}
-
-impl AngleTrig for Angle {
-    fn sin(&self) -> f64 {
-        RadData::from(*self).sin()
-    }
-    fn asin(&self) -> f64 {
-        RadData::from(*self).sin()
-    }
-    fn cos(&self) -> f64 {
-        RadData::from(*self).cos()
-    }
-    fn acos(&self) -> f64 {
-        RadData::from(*self).acos()
-    }
-    fn atan2(&self, other: &Self) -> f64 {
-        RadData::from(*self).atan2(&RadData::from(*other))
-    }
-}
-
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Angle {
-    Degree(DegData),
-    Radian(RadData),
-    Hour(HourData),
+    Degree(f64),
+    Radian(f64),
+    Hour(f64),
 }
 
-impl From<RadData> for DegData {
-    fn from(rad: RadData) -> Self {
-        const RAD_TO_DEG: f64 = 180.0 / PI;
-        Self(rad.0 * RAD_TO_DEG)
-    }
-}
-
-impl From<HourData> for DegData {
-    fn from(hr: HourData) -> Self {
-        const HR_TO_DEG: f64 = 15.0;
-        Self(hr.0 * HR_TO_DEG)
-    }
-}
-
-impl From<RadData> for HourData {
-    fn from(rad: RadData) -> Self {
-        const RAD_TO_HR: f64 = 180.0 / PI / 15.0;
-        Self(rad.0 * RAD_TO_HR)
-    }
-}
-
-impl From<DegData> for HourData {
-    fn from(deg: DegData) -> Self {
-        const DEG_TO_HR: f64 = 1.0 / 15.0;
-        Self(deg.0 * DEG_TO_HR)
-    }
-}
-
-impl From<HourData> for RadData {
-    fn from(hr: HourData) -> Self {
-        const HR_TO_RAD: f64 = 15.0 * PI / 180.0;
-        Self(hr.0 * HR_TO_RAD)
-    }
-}
-
-impl From<DegData> for RadData {
-    fn from(deg: DegData) -> Self {
-        const DEG_TO_RAD: f64 = PI / 180.0;
-        Self(deg.0 * DEG_TO_RAD)
-    }
-}
-
-impl From<DegData> for Angle {
-    fn from(deg: DegData) -> Self {
-        Self::Degree(deg)
-    }
-}
-
-impl From<RadData> for Angle {
-    fn from(rad: RadData) -> Self {
-        Self::Radian(rad)
-    }
-}
-
-impl From<HourData> for Angle {
-    fn from(hr: HourData) -> Self {
-        Self::Hour(hr)
-    }
-}
-
-impl From<Angle> for DegData {
-    fn from(angle: Angle) -> Self {
-        match angle {
-            Angle::Degree(a) => a,
-            Angle::Radian(a) => DegData::from(a),
-            Angle::Hour(a) => DegData::from(a),
+impl Angle {
+    pub fn to_deg(&self) -> f64 {
+        match self {
+            Self::Degree(deg) => *deg,
+            Self::Hour(hr) => 15.0 * hr,
+            Self::Radian(rad) => {
+                const RAD_TO_DEG: f64 = 180.0 / PI;
+                RAD_TO_DEG * rad
+            }
         }
     }
-}
-
-impl From<Angle> for RadData {
-    fn from(angle: Angle) -> Self {
-        match angle {
-            Angle::Degree(a) => RadData::from(a),
-            Angle::Radian(a) => a,
-            Angle::Hour(a) => RadData::from(a),
+    pub fn to_rad(&self) -> f64 {
+        match self {
+            Self::Degree(deg) => {
+                const DEG_TO_RAD: f64 = PI / 180.0;
+                DEG_TO_RAD * deg
+            }
+            Self::Hour(hr) => {
+                const HOUR_TO_RAD: f64 = 15.0 * PI / 180.0;
+                HOUR_TO_RAD * hr
+            }
+            Self::Radian(rad) => *rad,
         }
+    }
+    pub fn to_hr(&self) -> f64 {
+        match self {
+            Self::Degree(deg) => deg / 15.0,
+            Self::Hour(hr) => *hr,
+            Self::Radian(rad) => {
+                const RAD_TO_HOUR: f64 = 180.0 / PI / 15.0;
+                RAD_TO_HOUR * rad
+            }
+        }
+    }
+    pub fn sin(&self) -> f64 {
+        Self::to_rad(self).sin()
+    }
+    pub fn cos(&self) -> f64 {
+        Self::to_rad(self).cos()
+    }
+    pub fn tan(&self) -> f64 {
+        Self::to_rad(self).tan()
     }
 }
 
-impl From<Angle> for HourData {
-    fn from(angle: Angle) -> Self {
-        match angle {
-            Angle::Degree(a) => HourData::from(a),
-            Angle::Radian(a) => HourData::from(a),
-            Angle::Hour(a) => a,
-        }
+impl_op_ex!(+ |a: &Angle, b: &Angle| -> Angle { match a {
+    Angle::Degree(deg) => Angle::Degree(deg + b.to_deg()),
+    Angle::Radian(rad) => Angle::Degree(rad + b.to_rad()),
+    Angle::Hour(hr) => Angle::Degree(hr + b.to_hr()),
+} });
+
+impl_op_ex!(-|a: &Angle, b: &Angle| -> Angle {
+    match a {
+        Angle::Degree(deg) => Angle::Degree(deg - b.to_deg()),
+        Angle::Radian(rad) => Angle::Degree(rad - b.to_rad()),
+        Angle::Hour(hr) => Angle::Degree(hr - b.to_hr()),
     }
-}
+});
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Sign {
@@ -247,87 +118,35 @@ impl ArcMinuteSecond for Hms {
     }
 }
 
-// I can't figure out how to use generic type parameters in From<T> :sad_face:
-
 impl From<Angle> for Dms {
     fn from(angle: Angle) -> Self {
-        Self::angle_to_ams(DegData::from(angle).0)
-    }
-}
-
-impl From<DegData> for Dms {
-    fn from(angle: DegData) -> Self {
-        Self::angle_to_ams(angle.0)
-    }
-}
-
-impl From<RadData> for Dms {
-    fn from(angle: RadData) -> Self {
-        Self::angle_to_ams(DegData::from(angle).0)
-    }
-}
-
-impl From<HourData> for Dms {
-    fn from(angle: HourData) -> Self {
-        Self::angle_to_ams(DegData::from(angle).0)
+        Self::angle_to_ams(angle.to_deg())
     }
 }
 
 impl From<Angle> for Hms {
     fn from(angle: Angle) -> Self {
-        Self::angle_to_ams(HourData::from(angle).0)
-    }
-}
-
-impl From<DegData> for Hms {
-    fn from(angle: DegData) -> Self {
-        Self::angle_to_ams(HourData::from(angle).0)
-    }
-}
-
-impl From<RadData> for Hms {
-    fn from(angle: RadData) -> Self {
-        Self::angle_to_ams(HourData::from(angle).0)
-    }
-}
-
-impl From<HourData> for Hms {
-    fn from(angle: HourData) -> Self {
-        Self::angle_to_ams(angle.0)
-    }
-}
-
-// TODO: DRY this somehow.
-
-impl From<Hms> for HourData {
-    fn from(angle: Hms) -> HourData {
-        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
-        match angle.0 {
-            Sign::Plus => HourData(angle_abs),
-            Sign::Minus => HourData(-angle_abs),
-        }
-    }
-}
-
-impl From<Dms> for DegData {
-    fn from(angle: Dms) -> DegData {
-        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
-        match angle.0 {
-            Sign::Plus => DegData(angle_abs),
-            Sign::Minus => DegData(-angle_abs),
-        }
+        Self::angle_to_ams(angle.to_hr())
     }
 }
 
 impl From<Dms> for Angle {
-    fn from(dms: Dms) -> Angle {
-        Angle::from(DegData::from(dms))
+    fn from(angle: Dms) -> Angle {
+        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
+        match angle.0 {
+            Sign::Plus => Angle::Degree(angle_abs),
+            Sign::Minus => Angle::Degree(-angle_abs),
+        }
     }
 }
 
 impl From<Hms> for Angle {
-    fn from(hms: Hms) -> Angle {
-        Angle::from(HourData::from(hms))
+    fn from(angle: Hms) -> Angle {
+        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
+        match angle.0 {
+            Sign::Plus => Angle::Hour(angle_abs),
+            Sign::Minus => Angle::Hour(-angle_abs),
+        }
     }
 }
 
@@ -337,31 +156,123 @@ mod tests {
 
     #[test]
     fn test_angle() {
-        assert_eq!(DegData(90.0), DegData::from(RadData(PI / 2.0)));
-        assert_eq!(DegData(90.0), DegData::from(HourData(6.0)));
-        assert_eq!(HourData(6.0), HourData::from(RadData(PI / 2.0)));
-        assert_eq!(HourData(6.0), HourData::from(DegData(90.0)));
-        assert_eq!(RadData(PI / 2.0), RadData::from(HourData(6.0)));
-        assert_eq!(RadData(PI / 2.0), RadData::from(DegData(90.0)));
+        assert_float_absolute_eq!(
+            Angle::Degree(90.0).to_deg(),
+            Angle::Radian(PI / 2.0).to_deg()
+        );
+        assert_float_absolute_eq!(Angle::Degree(90.0).to_deg(), Angle::Hour(6.0).to_deg());
+        assert_float_absolute_eq!(Angle::Hour(6.0).to_deg(), Angle::Radian(PI / 2.0).to_deg());
+        assert_float_absolute_eq!(Angle::Hour(6.0).to_deg(), Angle::Degree(90.0).to_deg());
+        assert_float_absolute_eq!(Angle::Radian(PI / 2.0).to_deg(), Angle::Hour(6.0).to_deg());
+        assert_float_absolute_eq!(
+            Angle::Radian(PI / 2.0).to_deg(),
+            Angle::Degree(90.0).to_deg()
+        );
     }
 
     #[test]
     fn test_ams() {
         // Dms
-        assert_eq!(Dms::from(DegData(0.0)), Dms::new(Sign::Plus, 0, 0, 0.0));
-        assert_eq!(Dms::from(DegData(-0.0)), Dms::new(Sign::Minus, 0, 0, 0.0));
-        assert_eq!(Dms::from(DegData(180.0)), Dms::new(Sign::Plus, 180, 0, 0.0));
-        assert_eq!(Dms::from(RadData(0.0)), Dms::new(Sign::Plus, 0, 0, 0.0));
-        assert_eq!(Dms::from(RadData(-0.0)), Dms::new(Sign::Minus, 0, 0, 0.0));
-        assert_eq!(Dms::from(RadData(PI)), Dms::new(Sign::Plus, 180, 0, 0.0));
-        assert_eq!(Dms::from(HourData(12.0)), Dms::new(Sign::Plus, 180, 0, 0.0));
+        assert_eq!(
+            Dms::from(Angle::Degree(0.0)),
+            Dms::new(Sign::Plus, 0, 0, 0.0)
+        );
+        assert_eq!(
+            Dms::from(Angle::Degree(-0.0)),
+            Dms::new(Sign::Minus, 0, 0, 0.0)
+        );
+        assert_eq!(
+            Dms::from(Angle::Degree(180.0)),
+            Dms::new(Sign::Plus, 180, 0, 0.0)
+        );
+        assert_eq!(
+            Dms::from(Angle::Radian(0.0)),
+            Dms::new(Sign::Plus, 0, 0, 0.0)
+        );
+        assert_eq!(
+            Dms::from(Angle::Radian(-0.0)),
+            Dms::new(Sign::Minus, 0, 0, 0.0)
+        );
+        assert_eq!(
+            Dms::from(Angle::Radian(PI)),
+            Dms::new(Sign::Plus, 180, 0, 0.0)
+        );
+        assert_eq!(
+            Dms::from(Angle::Hour(12.0)),
+            Dms::new(Sign::Plus, 180, 0, 0.0)
+        );
         // Hms
-        assert_eq!(Hms::from(DegData(0.0)), Hms::new(Sign::Plus, 0, 0, 0.0));
-        assert_eq!(Hms::from(DegData(-0.0)), Hms::new(Sign::Minus, 0, 0, 0.0));
-        assert_eq!(Hms::from(HourData(12.0)), Hms::new(Sign::Plus, 12, 0, 0.0));
-        assert_eq!(Hms::from(RadData(0.0)), Hms::new(Sign::Plus, 0, 0, 0.0));
-        assert_eq!(Hms::from(RadData(-0.0)), Hms::new(Sign::Minus, 0, 0, 0.0));
-        assert_eq!(Hms::from(RadData(PI)), Hms::new(Sign::Plus, 12, 0, 0.0));
-        assert_eq!(Hms::from(DegData(180.0)), Hms::new(Sign::Plus, 12, 0, 0.0));
+        assert_eq!(
+            Hms::from(Angle::Degree(0.0)),
+            Hms::new(Sign::Plus, 0, 0, 0.0)
+        );
+        assert_eq!(
+            Hms::from(Angle::Degree(-0.0)),
+            Hms::new(Sign::Minus, 0, 0, 0.0)
+        );
+        assert_eq!(
+            Hms::from(Angle::Hour(12.0)),
+            Hms::new(Sign::Plus, 12, 0, 0.0)
+        );
+        assert_eq!(
+            Hms::from(Angle::Radian(0.0)),
+            Hms::new(Sign::Plus, 0, 0, 0.0)
+        );
+        assert_eq!(
+            Hms::from(Angle::Radian(-0.0)),
+            Hms::new(Sign::Minus, 0, 0, 0.0)
+        );
+        assert_eq!(
+            Hms::from(Angle::Radian(PI)),
+            Hms::new(Sign::Plus, 12, 0, 0.0)
+        );
+        assert_eq!(
+            Hms::from(Angle::Degree(180.0)),
+            Hms::new(Sign::Plus, 12, 0, 0.0)
+        );
+    }
+    // TODO: test trig functions
+
+    #[test]
+    fn test_trig() {
+        assert_float_absolute_eq!(1.0, Angle::Degree(0.0).cos());
+        assert_float_absolute_eq!(1.0, Angle::Hour(0.0).cos());
+        assert_float_absolute_eq!(1.0, Angle::Radian(0.0).cos());
+
+        assert_float_absolute_eq!(0.0, Angle::Degree(90.0).cos());
+        assert_float_absolute_eq!(0.0, Angle::Hour(6.0).cos());
+        assert_float_absolute_eq!(0.0, Angle::Radian(PI / 2.0).cos());
+
+        assert_float_absolute_eq!(0.5, Angle::Degree(60.0).cos());
+        assert_float_absolute_eq!(0.5, Angle::Hour(4.0).cos());
+        assert_float_absolute_eq!(0.5, Angle::Radian(PI / 3.0).cos());
+
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Degree(45.0).cos());
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Hour(3.0).cos());
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Radian(PI / 4.0).cos());
+
+        assert_float_absolute_eq!(0.0, Angle::Degree(0.0).sin());
+        assert_float_absolute_eq!(0.0, Angle::Hour(0.0).sin());
+        assert_float_absolute_eq!(0.0, Angle::Radian(0.0).sin());
+
+        assert_float_absolute_eq!(1.0, Angle::Degree(90.0).sin());
+        assert_float_absolute_eq!(1.0, Angle::Hour(6.0).sin());
+        assert_float_absolute_eq!(1.0, Angle::Radian(PI / 2.0).sin());
+
+        assert_float_absolute_eq!(3_f64.sqrt() / 2.0, Angle::Degree(60.0).sin());
+        assert_float_absolute_eq!(3_f64.sqrt() / 2.0, Angle::Hour(4.0).sin());
+        assert_float_absolute_eq!(3_f64.sqrt() / 2.0, Angle::Radian(PI / 3.0).sin());
+
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Degree(45.0).sin());
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Hour(3.0).sin());
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Radian(PI / 4.0).sin());
+
+        assert_float_absolute_eq!(0.5, Angle::Degree(30.0).sin());
+        assert_float_absolute_eq!(0.5, Angle::Hour(2.0).sin());
+        assert_float_absolute_eq!(0.5, Angle::Radian(PI / 6.0).sin());
+
+        assert_float_absolute_eq!(1.0, Angle::Degree(45.0).tan());
+        assert_float_absolute_eq!(1.0, Angle::Hour(3.0).tan());
+        assert_float_absolute_eq!(1.0, Angle::Radian(PI / 4.0).tan());
     }
 }

@@ -1,12 +1,14 @@
-use crate::angle::{HourData, RadData, TWO_PI};
+use crate::angle::{Angle, TWO_PI};
 
 pub use chrono::prelude::*;
 
 #[allow(clippy::excessive_precision)] // actual equation has that much precision
-pub fn earth_rotation_angle(time_julian_ut1: JulianDate) -> RadData {
+pub fn earth_rotation_angle(time_julian_ut1: JulianDate) -> Angle {
     // https://en.wikipedia.org/wiki/Sidereal_time
 
-    RadData(TWO_PI * (0.7790572732640 + 1.00273781191135448 * (time_julian_ut1.0 - 2451545.0)))
+    Angle::Radian(
+        TWO_PI * (0.7790572732640 + 1.00273781191135448 * (time_julian_ut1.0 - 2451545.0)),
+    )
 }
 
 #[derive(Debug)]
@@ -44,12 +46,12 @@ where
 }
 
 // Greenwich Mean Sidereal Time
-pub struct GMST(pub HourData);
+pub struct GMST(pub Angle);
 
 impl From<JulianDate> for GMST {
     fn from(julian_date: JulianDate) -> Self {
         // https://en.wikipedia.org/wiki/Sidereal_time
-        Self(HourData::from(earth_rotation_angle(julian_date)))
+        Self(Angle::Hour(earth_rotation_angle(julian_date).to_hr()))
     }
 }
 
@@ -61,12 +63,6 @@ mod tests {
     fn test_juliandate() {
         // From: https://en.wikipedia.org/wiki/Epoch_(astronomy)#J2000
         // Definition of J2000 epoch
-        // NOTE: Local timezones are off by 0.25 somehow...
-        // assert_eq!(
-        //     JulianDate::from(Local.ymd(2000, 1, 1).and_hms(12, 0, 0)).0,
-        //     2451545.0
-        // );
-
         assert_eq!(
             JulianDate::from(Utc.with_ymd_and_hms(2000, 1, 1, 12, 0, 0).unwrap()).0,
             2451545.0
@@ -74,11 +70,6 @@ mod tests {
 
         // From: https://en.wikipedia.org/wiki/Julian_day
         // 00:30:00.0 UT January 1, 2013, is 2_456_293.520_833
-        // NOTE: Local timezones are off by 0.25 somehow...
-        // assert!(
-        //     (JulianDate::from(Local.ymd(2013, 1, 1).and_hms(0, 30, 0)).0 - 2_456_293.520_833).abs()
-        //         < 1_e-6,
-        // );
         assert!(
             (JulianDate::from(Utc.with_ymd_and_hms(2013, 1, 1, 0, 30, 0).unwrap()).0
                 - 2_456_293.520_833)
