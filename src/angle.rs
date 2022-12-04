@@ -72,16 +72,16 @@ impl_op_ex!(-|a: &Angle, b: &Angle| -> Angle {
     }
 });
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Sign {
     Plus,
     Minus,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Dms(Sign, u32, u32, f64);
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Hms(Sign, u32, u32, f64);
 
 pub trait ArcMinuteSecond {
