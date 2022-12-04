@@ -235,7 +235,9 @@ mod tests {
         let _stars = parse_catalog!(
             OSBSCStar,
             Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
-            Some(262)
+            // NOTE: it seems like we don't need to pad this catalog even though it has no delimiters.
+            // In case it breaks in the future: Some(262)
+            None
         );
         println!("Number of stars: {}", _stars.len());
         println!("Last Star: {:?}", _stars.last().unwrap());
