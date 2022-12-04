@@ -239,6 +239,5 @@ mod tests {
         );
         println!("Number of stars: {}", _stars.len());
         println!("Last Star: {:?}", _stars.last().unwrap());
-        panic!()
     }
 }
