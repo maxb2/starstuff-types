@@ -1,5 +1,5 @@
-// Parse Yale Bright Star Catalog
-// http://tdc-www.harvard.edu/catalogs/bsc5.html
+// Parse Open Source Bright Star Catalog
+// https://github.com/johanley/star-catalog
 // NOTE: run the `get_data.sh` script to get the tests to pass.
 
 use super::ValidParse;
@@ -7,7 +7,7 @@ use crate::parse_trim;
 
 #[allow(non_snake_case)] // Copying field names from original data source
 #[derive(Debug, Clone)]
-pub struct YaleStar {
+pub struct OSBSCStar {
     pub HR: Option<usize>, //           [1/9110]+ Harvard Revised Number = Bright Star Number
     pub Name: Option<String>, //        Name, generally Bayer and/or Flamsteed name
     pub DM: Option<String>, //          Durchmusterung Identification (zone in bytes 17-19)
@@ -63,11 +63,11 @@ pub struct YaleStar {
     pub NoteFlag: Option<String>, //    [*] a star indicates that there is a note (see file notes)
 }
 
-impl TryFrom<String> for YaleStar {
+impl TryFrom<String> for OSBSCStar {
     type Error = ();
 
     fn try_from(s: String) -> Result<Self, Self::Error> {
-        Ok(YaleStar {
+        let star = Self {
             HR: parse_trim!(usize, s[0..4]),
             Name: parse_trim!(String, s[4..14]),
             DM: parse_trim!(String, s[14..25]),
@@ -121,11 +121,16 @@ impl TryFrom<String> for YaleStar {
             MultID: parse_trim!(String, s[190..194]),
             MultCnt: parse_trim!(usize, s[194..196]),
             NoteFlag: parse_trim!(String, s[196..197]),
-        })
+        };
+        if star.is_valid_parse() {
+            Ok(star)
+        } else {
+            Err(())
+        }
     }
 }
 
-impl ValidParse for YaleStar {
+impl ValidParse for OSBSCStar {
     fn is_valid_parse(&self) -> bool {
         self.HR.is_some()
             && self.DE_.is_some()
@@ -140,20 +145,22 @@ impl ValidParse for YaleStar {
 
 #[cfg(test)]
 mod tests {
-    use crate::parse::yale::*;
+    use crate::catalog::osbsc::*;
     use crate::parse_catalog;
 
     #[test]
-    fn test_yaleparse() {
+    fn test_yalestar_from() {
         let s = String::from("   1          BD+44 4550      3 36042          46           000001.1+444022000509.9+451345114.44-16.88 6.70  +0.07 +0.08         A1Vn               -0.012-0.018      -018      195  4.2  21.6AC   3 ");
-        println!("{}", s);
-        let star = YaleStar::try_from(s);
-        println!("{:?}", star);
+        OSBSCStar::try_from(s).unwrap();
     }
 
     #[test]
     fn test_catalog() {
-        let _stars = parse_catalog!(YaleStar, Path::new("data/Yale/bsc5.dat"), Some(197));
+        let _stars = parse_catalog!(
+            OSBSCStar,
+            Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
+            Some(197)
+        );
         println!("Number of stars: {}", _stars.len());
         println!("Last Star: {:?}", _stars.last().unwrap());
     }
