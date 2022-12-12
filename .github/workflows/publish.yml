@@ -17,4 +17,4 @@ jobs:
         with:
           args: cargo fmt -- --check && cargo clippy -- -Dwarnings && cargo test && cargo publish --token ${CARGO_REGISTRY_TOKEN}
         env:
-           CARGO_REGISTRY_TOKEN=${{ secrets.CARGO_REGISTRY_TOKEN }}
+           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
