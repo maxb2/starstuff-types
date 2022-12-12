@@ -132,6 +132,6 @@ mod tests {
 
         println!("Number of Constellations: {}", constells.len());
         println!("{:?}", constells.first());
-        panic!();
+        // panic!();
     }
 }
