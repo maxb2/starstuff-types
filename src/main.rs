@@ -1,11 +1,20 @@
 use starmap::angle::Angle;
-use starmap::coord::{Equitorial, Geographic, Horizontal, Latitude, Longitude};
+use starmap::coord::{
+    Declination, Equitorial, Geographic, Horizontal, Latitude, Longitude, RightAscension,
+};
 use starmap::star::{Star, StarCoordinates};
-use starmap::util::*;
+use starmap::time::*;
 
 fn main() {
-    // let mut stars = parse_catalog(&String::from("./catalog.json"));
-    let mut stars: Vec<Star> = [].to_vec();
+    let mut stars: Vec<Star> = vec![Star {
+        coordinates: StarCoordinates::Equitorial(Equitorial {
+            right_ascension: RightAscension(Angle::Degree(10.0)),
+            declination: Declination(Angle::Degree(20.0)),
+        }),
+        v_mag: 0.0,
+        harvard: 1,
+        name: String::from("dummy"),
+    }];
 
     println!("{:?}", &stars[0]);
 

@@ -1,5 +1,5 @@
 use crate::angle::{Angle, PI, PI_FOURTH, PI_HALF};
-use crate::util::GMST;
+use crate::time::GMST;
 
 pub trait ConstrainedAngle {
     fn new(angle: &Angle) -> Self;

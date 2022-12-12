@@ -1,10 +1,14 @@
+// NOTE: still under construction!
+
 use crate::catalog::osbsc::OSBSCStar;
 
+#[allow(dead_code)] // FIXME
 #[derive(Debug, Clone)]
 struct Polyline<T> {
     lines: Vec<T>,
 }
 
+#[allow(dead_code)] // FIXME
 #[derive(Debug, Clone)]
 
 struct Constellation<'a> {
