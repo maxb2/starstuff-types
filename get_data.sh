@@ -4,11 +4,12 @@
 # Download star data from Yale Bright Stars Catalog and Hipparcos Catalog #
 # Yale: http://tdc-www.harvard.edu/catalogs/bsc5.html                     #
 # Hipparcos: https://heasarc.gsfc.nasa.gov/W3Browse/all/hipparcos.html    #
+# Open Source BSC: https://github.com/johanley/star-catalog/              #
 ###########################################################################
 
+# TODO: make a simple rust cli to replace this script
 
-mkdir -p data/Hipparcos
-mkdir -p data/Yale
+mkdir -p data/{Hipparcos,Yale,OSBSC}
 
 (
     cd data/Hipparcos
@@ -23,4 +24,11 @@ mkdir -p data/Yale
     wget -cv 'http://tdc-www.harvard.edu/catalogs/bsc5.notes.gz'
     gunzip bsc5.dat.gz
     gunzip bsc5.notes.gz
+)
+
+(
+    cd data/OSBSC
+    wget -cv 'https://github.com/johanley/star-catalog/raw/master/catalogs/output/open-source-bsc/ReadMe.utf8'
+    wget -cv 'https://github.com/johanley/star-catalog/raw/master/catalogs/output/open-source-bsc/os-bright-star-catalog-hip.utf8'
+    wget -cv 'https://github.com/johanley/constellation-lines/raw/master/output/constellation-lines-hip.utf8'
 )

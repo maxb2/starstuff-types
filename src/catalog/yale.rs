@@ -67,7 +67,7 @@ impl TryFrom<String> for YaleStar {
     type Error = ();
 
     fn try_from(s: String) -> Result<Self, Self::Error> {
-        Ok(YaleStar {
+        let star = Self {
             HR: parse_trim!(usize, s[0..4]),
             Name: parse_trim!(String, s[4..14]),
             DM: parse_trim!(String, s[14..25]),
@@ -121,7 +121,12 @@ impl TryFrom<String> for YaleStar {
             MultID: parse_trim!(String, s[190..194]),
             MultCnt: parse_trim!(usize, s[194..196]),
             NoteFlag: parse_trim!(String, s[196..197]),
-        })
+        };
+        if star.is_valid_parse() {
+            Ok(star)
+        } else {
+            Err(())
+        }
     }
 }
 
@@ -140,15 +145,13 @@ impl ValidParse for YaleStar {
 
 #[cfg(test)]
 mod tests {
-    use crate::parse::yale::*;
+    use crate::catalog::yale::*;
     use crate::parse_catalog;
 
     #[test]
-    fn test_yaleparse() {
+    fn test_yalestar_from() {
         let s = String::from("   1          BD+44 4550      3 36042          46           000001.1+444022000509.9+451345114.44-16.88 6.70  +0.07 +0.08         A1Vn               -0.012-0.018      -018      195  4.2  21.6AC   3 ");
-        println!("{}", s);
-        let star = YaleStar::try_from(s);
-        println!("{:?}", star);
+        YaleStar::try_from(s).unwrap();
     }
 
     #[test]

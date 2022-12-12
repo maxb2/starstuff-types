@@ -2,7 +2,7 @@ use crate::angle::{Angle, TWO_PI};
 
 pub use chrono::prelude::*;
 
-#[allow(clippy::excessive_precision)] // actual equation has that much precision
+#[allow(clippy::excessive_precision)] // NOTE: actual equation has that much precision
 pub fn earth_rotation_angle(time_julian_ut1: JulianDate) -> Angle {
     // https://en.wikipedia.org/wiki/Sidereal_time
 
@@ -26,7 +26,7 @@ where
         let date: DateTime<Utc> = date.into();
         assert!(
             1801 <= date.year() && date.year() <= 2099,
-            "Datetime must be between year 1801 and 2099"
+            "Datetime must be between year 1801 and 2099" // TODO: Find an algorithm that has a wider range.
         );
 
         Self(
@@ -57,7 +57,7 @@ impl From<JulianDate> for GMST {
 
 #[cfg(test)]
 mod tests {
-    use crate::util::*;
+    use crate::time::*;
 
     #[test]
     fn test_juliandate() {
@@ -70,11 +70,10 @@ mod tests {
 
         // From: https://en.wikipedia.org/wiki/Julian_day
         // 00:30:00.0 UT January 1, 2013, is 2_456_293.520_833
-        assert!(
-            (JulianDate::from(Utc.with_ymd_and_hms(2013, 1, 1, 0, 30, 0).unwrap()).0
-                - 2_456_293.520_833)
-                .abs()
-                < 1_e-6,
+        assert_float_absolute_eq!(
+            JulianDate::from(Utc.with_ymd_and_hms(2013, 1, 1, 0, 30, 0).unwrap()).0,
+            2_456_293.520_833,
+            1e-6
         );
     }
 }

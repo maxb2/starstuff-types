@@ -1,5 +1,6 @@
 use crate::coord::{Cartesian, Equitorial, Horizontal, Polar};
 
+// TODO: simplify this enum like crate::angle::Angle
 #[derive(Debug, Copy, Clone)]
 pub enum StarCoordinates {
     Cartesian(Cartesian),
@@ -8,6 +9,7 @@ pub enum StarCoordinates {
     Stereo(Polar),
 }
 
+// TODO: move this to a different crate and implement `from` traits for the catalog star structs in this crate.
 #[derive(Debug, Clone)]
 pub struct Star {
     pub coordinates: StarCoordinates,

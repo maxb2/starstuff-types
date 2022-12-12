@@ -1,4 +1,5 @@
-pub mod hip;
+pub mod hipparcos;
+pub mod osbsc;
 pub mod util;
 pub mod yale;
 

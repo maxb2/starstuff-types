@@ -72,51 +72,49 @@ impl_op_ex!(-|a: &Angle, b: &Angle| -> Angle {
     }
 });
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Sign {
     Plus,
     Minus,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Dms(Sign, u32, u32, f64);
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Hms(Sign, u32, u32, f64);
 
-pub trait ArcMinuteSecond {
-    fn new(sign: Sign, major: u32, minute: u32, second: f64) -> Self;
-    fn angle_to_ams(decimal: f64) -> Self
-    where
-        Self: std::marker::Sized,
-    {
-        let major: u32 = decimal as u32;
-        let min: f64 = (decimal - (major as f64)) * 60.0;
-        let second: f64 = (min - (min as u32 as f64)) * 60.0;
-        Self::new(
-            if decimal.is_sign_positive() {
-                Sign::Plus
-            } else {
-                Sign::Minus
-            },
-            major,
-            min as u32,
-            second,
-        )
-    }
+// NOTE: this is a macro rather than a public trait so I can implement a type trait without repeating myself for multiple types.
+macro_rules! impl_arc_minute_second {
+    ($T:ty) => {
+        impl $T {
+            pub fn new(sign: Sign, major: u32, minute: u32, second: f64) -> Self {
+                Self(sign, major, minute, second)
+            }
+            pub fn angle_to_ams(decimal: f64) -> Self
+            where
+                Self: std::marker::Sized,
+            {
+                let major: u32 = decimal as u32;
+                let min: f64 = (decimal - (major as f64)) * 60.0;
+                let second: f64 = (min - (min as u32 as f64)) * 60.0;
+                Self::new(
+                    if decimal.is_sign_positive() {
+                        Sign::Plus
+                    } else {
+                        Sign::Minus
+                    },
+                    major,
+                    min as u32,
+                    second,
+                )
+            }
+        }
+    };
 }
 
-impl ArcMinuteSecond for Dms {
-    fn new(sign: Sign, degree: u32, minute: u32, second: f64) -> Self {
-        Self(sign, degree, minute, second)
-    }
-}
-
-impl ArcMinuteSecond for Hms {
-    fn new(sign: Sign, hour: u32, minute: u32, second: f64) -> Self {
-        Self(sign, hour, minute, second)
-    }
-}
+impl_arc_minute_second!(Dms);
+impl_arc_minute_second!(Hms);
 
 impl From<Angle> for Dms {
     fn from(angle: Angle) -> Self {
