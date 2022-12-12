@@ -7,6 +7,7 @@ description = "A simple star catalog parser and primitive types for star coordin
 homepage = "https://github.com/maxb2/starstuff-types"
 repository = "https://github.com/maxb2/starstuff-types"
 readme = "README.md"
+exclude = ["data/*"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
