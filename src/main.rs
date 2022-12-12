@@ -1,9 +1,9 @@
-use starmap::angle::Angle;
-use starmap::coord::{
+use starstuff_types::angle::Angle;
+use starstuff_types::coord::{
     Declination, Equitorial, Geographic, Horizontal, Latitude, Longitude, RightAscension,
 };
-use starmap::star::{Star, StarCoordinates};
-use starmap::time::*;
+use starstuff_types::star::{Star, StarCoordinates};
+use starstuff_types::time::*;
 
 fn main() {
     let mut stars: Vec<Star> = vec![Star {
