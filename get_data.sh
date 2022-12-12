@@ -7,6 +7,7 @@
 # Open Source BSC: https://github.com/johanley/star-catalog/              #
 ###########################################################################
 
+# TODO: make a simple rust cli to replace this script
 
 mkdir -p data/{Hipparcos,Yale,OSBSC}
 
