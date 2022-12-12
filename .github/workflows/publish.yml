@@ -1,0 +1,18 @@
+name: Publish Crate
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Get Data 
+        run: ./get_data.sh
+      - uses: icepuma/rust-action@master
+        with:
+          args: cargo fmt -- --check && cargo clippy -- -Dwarnings && cargo test && cargo publish
