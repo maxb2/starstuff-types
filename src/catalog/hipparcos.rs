@@ -3,7 +3,7 @@
 // NOTE: run the `get_data.sh` script to get the tests to pass.
 
 use super::ValidParse;
-use crate::angle::{Angle, ArcMinuteSecond, Dms, Hms, Sign};
+use crate::angle::{Angle, Dms, Hms, Sign};
 use crate::coord::{Declination, RightAscension};
 
 use std::convert::TryFrom;

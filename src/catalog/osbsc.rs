@@ -5,7 +5,7 @@
 use super::ValidParse;
 use crate::parse_trim;
 
-use crate::angle::{ArcMinuteSecond, Dms, Hms, Sign};
+use crate::angle::{Dms, Hms, Sign};
 
 macro_rules! parse_ams {
     (hms, $s:expr) => {{
