@@ -29,4 +29,5 @@ mkdir -p data/{Hipparcos,Yale,OSBSC}
     cd data/OSBSC
     wget -cv 'https://github.com/johanley/star-catalog/raw/master/catalogs/output/open-source-bsc/ReadMe.utf8'
     wget -cv 'https://github.com/johanley/star-catalog/raw/master/catalogs/output/open-source-bsc/os-bright-star-catalog-hip.utf8'
+    wget -cv 'https://github.com/johanley/constellation-lines/raw/master/output/constellation-lines-hip.utf8'
 )
