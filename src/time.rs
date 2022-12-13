@@ -1,18 +1,30 @@
+/*!
+Astonomical time types and utilities
+ */
+
 use crate::angle::{Angle, TWO_PI};
 
-pub use chrono::prelude::*;
+pub use chrono::DateTime;
+use chrono::{Datelike, Timelike, Utc};
 
+/**
+Earth Rotation Angle
+
+<https://en.wikipedia.org/wiki/Sidereal_time>
+ */
 #[allow(clippy::excessive_precision)] // NOTE: actual equation has that much precision
 pub fn earth_rotation_angle(time_julian_ut1: JulianDate) -> Angle {
-    // https://en.wikipedia.org/wiki/Sidereal_time
-
     Angle::Radian(
         TWO_PI * (0.7790572732640 + 1.00273781191135448 * (time_julian_ut1.0 - 2451545.0)),
     )
 }
 
+/// Julian Date (J2000 epoch)
 #[derive(Debug)]
-pub struct JulianDate(pub f64);
+pub struct JulianDate(
+    /// Seconds since J2000
+    pub f64,
+);
 
 impl<T> From<DateTime<T>> for JulianDate
 where
@@ -45,8 +57,11 @@ where
     }
 }
 
-// Greenwich Mean Sidereal Time
-pub struct GMST(pub Angle);
+/// Greenwich Mean Sidereal Time
+pub struct GMST(
+    /// Hour
+    pub Angle,
+);
 
 impl From<JulianDate> for GMST {
     fn from(julian_date: JulianDate) -> Self {
@@ -57,6 +72,8 @@ impl From<JulianDate> for GMST {
 
 #[cfg(test)]
 mod tests {
+    use chrono::TimeZone;
+
     use crate::time::*;
 
     #[test]

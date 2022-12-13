@@ -1,3 +1,6 @@
+//! Shared utilities for catalog parsing
+
+/// Trim a string before parsing into a given type.
 #[macro_export]
 macro_rules! parse_trim {
     // Need to trim because numbers are space padded in catalogs
@@ -15,6 +18,7 @@ macro_rules! parse_trim {
     };
 }
 
+/// Parse a catalog file into a vector of a given type
 #[macro_export]
 macro_rules! parse_catalog {
     ($T:ty, $path:expr, $pad:expr) => {

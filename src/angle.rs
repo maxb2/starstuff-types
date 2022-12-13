@@ -1,19 +1,31 @@
+/*!
+Basic angle structures (Radian, Degree, Arc Hour)
+ */
+
 use auto_ops::*;
 
 pub use std::f64::consts::PI;
 
+/// 2π
 pub const TWO_PI: f64 = 2.0 * PI;
+/// π/2
 pub const PI_HALF: f64 = PI / 2.0;
+/// π/4
 pub const PI_FOURTH: f64 = PI / 4.0;
 
+/// Enum containing common angle variants
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Angle {
+    /// Variant containing decimal degree
     Degree(f64),
+    /// Variant containing decimal radian
     Radian(f64),
+    /// Variant containing decimal hour
     Hour(f64),
 }
 
 impl Angle {
+    /// Convert to decimal degree
     pub fn to_deg(&self) -> f64 {
         match self {
             Self::Degree(deg) => *deg,
@@ -24,6 +36,7 @@ impl Angle {
             }
         }
     }
+    /// Convert to decimal radian
     pub fn to_rad(&self) -> f64 {
         match self {
             Self::Degree(deg) => {
@@ -37,6 +50,7 @@ impl Angle {
             Self::Radian(rad) => *rad,
         }
     }
+    /// Convert to decimal hour
     pub fn to_hr(&self) -> f64 {
         match self {
             Self::Degree(deg) => deg / 15.0,
@@ -72,19 +86,45 @@ impl_op_ex!(-|a: &Angle, b: &Angle| -> Angle {
     }
 });
 
+/// Enum representing sign of number
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Sign {
-    Plus,
-    Minus,
+    Positive,
+    Negative,
 }
 
+/// Sexagesimal Degree
 #[derive(Debug, PartialEq, Clone)]
-pub struct Dms(Sign, u32, u32, f64);
+pub struct Dms(
+    /// Sign of angle
+    pub Sign,
+    /// Degrees
+    pub u32,
+    /// Arc minutes
+    pub u32,
+    /// Arc seconds
+    pub f64,
+);
 
+/// Sexagesimal Hour
 #[derive(Debug, PartialEq, Clone)]
-pub struct Hms(Sign, u32, u32, f64);
+pub struct Hms(
+    /// Sign of angle
+    pub Sign,
+    /// Hours
+    pub u32,
+    /// Minutes
+    pub u32,
+    /// Seconds
+    pub f64,
+);
 
-// NOTE: this is a macro rather than a public trait so I can implement a type trait without repeating myself for multiple types.
+/**
+Angle to sexagesimal angle implementation
+
+> NOTE: this is a macro rather than a public trait so I can implement a type trait without repeating myself for multiple types.
+
+*/
 macro_rules! impl_arc_minute_second {
     ($T:ty) => {
         impl $T {
@@ -100,9 +140,9 @@ macro_rules! impl_arc_minute_second {
                 let second: f64 = (min - (min as u32 as f64)) * 60.0;
                 Self::new(
                     if decimal.is_sign_positive() {
-                        Sign::Plus
+                        Sign::Positive
                     } else {
-                        Sign::Minus
+                        Sign::Negative
                     },
                     major,
                     min as u32,
@@ -132,8 +172,8 @@ impl From<Dms> for Angle {
     fn from(angle: Dms) -> Angle {
         let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
         match angle.0 {
-            Sign::Plus => Angle::Degree(angle_abs),
-            Sign::Minus => Angle::Degree(-angle_abs),
+            Sign::Positive => Angle::Degree(angle_abs),
+            Sign::Negative => Angle::Degree(-angle_abs),
         }
     }
 }
@@ -142,8 +182,8 @@ impl From<Hms> for Angle {
     fn from(angle: Hms) -> Angle {
         let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
         match angle.0 {
-            Sign::Plus => Angle::Hour(angle_abs),
-            Sign::Minus => Angle::Hour(-angle_abs),
+            Sign::Positive => Angle::Hour(angle_abs),
+            Sign::Negative => Angle::Hour(-angle_abs),
         }
     }
 }
@@ -173,60 +213,60 @@ mod tests {
         // Dms
         assert_eq!(
             Dms::from(Angle::Degree(0.0)),
-            Dms::new(Sign::Plus, 0, 0, 0.0)
+            Dms::new(Sign::Positive, 0, 0, 0.0)
         );
         assert_eq!(
             Dms::from(Angle::Degree(-0.0)),
-            Dms::new(Sign::Minus, 0, 0, 0.0)
+            Dms::new(Sign::Negative, 0, 0, 0.0)
         );
         assert_eq!(
             Dms::from(Angle::Degree(180.0)),
-            Dms::new(Sign::Plus, 180, 0, 0.0)
+            Dms::new(Sign::Positive, 180, 0, 0.0)
         );
         assert_eq!(
             Dms::from(Angle::Radian(0.0)),
-            Dms::new(Sign::Plus, 0, 0, 0.0)
+            Dms::new(Sign::Positive, 0, 0, 0.0)
         );
         assert_eq!(
             Dms::from(Angle::Radian(-0.0)),
-            Dms::new(Sign::Minus, 0, 0, 0.0)
+            Dms::new(Sign::Negative, 0, 0, 0.0)
         );
         assert_eq!(
             Dms::from(Angle::Radian(PI)),
-            Dms::new(Sign::Plus, 180, 0, 0.0)
+            Dms::new(Sign::Positive, 180, 0, 0.0)
         );
         assert_eq!(
             Dms::from(Angle::Hour(12.0)),
-            Dms::new(Sign::Plus, 180, 0, 0.0)
+            Dms::new(Sign::Positive, 180, 0, 0.0)
         );
         // Hms
         assert_eq!(
             Hms::from(Angle::Degree(0.0)),
-            Hms::new(Sign::Plus, 0, 0, 0.0)
+            Hms::new(Sign::Positive, 0, 0, 0.0)
         );
         assert_eq!(
             Hms::from(Angle::Degree(-0.0)),
-            Hms::new(Sign::Minus, 0, 0, 0.0)
+            Hms::new(Sign::Negative, 0, 0, 0.0)
         );
         assert_eq!(
             Hms::from(Angle::Hour(12.0)),
-            Hms::new(Sign::Plus, 12, 0, 0.0)
+            Hms::new(Sign::Positive, 12, 0, 0.0)
         );
         assert_eq!(
             Hms::from(Angle::Radian(0.0)),
-            Hms::new(Sign::Plus, 0, 0, 0.0)
+            Hms::new(Sign::Positive, 0, 0, 0.0)
         );
         assert_eq!(
             Hms::from(Angle::Radian(-0.0)),
-            Hms::new(Sign::Minus, 0, 0, 0.0)
+            Hms::new(Sign::Negative, 0, 0, 0.0)
         );
         assert_eq!(
             Hms::from(Angle::Radian(PI)),
-            Hms::new(Sign::Plus, 12, 0, 0.0)
+            Hms::new(Sign::Positive, 12, 0, 0.0)
         );
         assert_eq!(
             Hms::from(Angle::Degree(180.0)),
-            Hms::new(Sign::Plus, 12, 0, 0.0)
+            Hms::new(Sign::Positive, 12, 0, 0.0)
         );
     }
     // TODO: test trig functions

@@ -1,21 +1,28 @@
-// NOTE: still under construction!
+/*!
+WIP Open Source Constellation Catalog Parser
+
+> NOTE: still under construction!
+ */
 
 use crate::catalog::osbsc::OSBSCStar;
 
+/// Polyline
 #[allow(dead_code)] // FIXME
 #[derive(Debug, Clone)]
-struct Polyline<T> {
-    lines: Vec<T>,
+pub struct Polyline<T> {
+    pub lines: Vec<T>,
 }
 
+/// Constellation
 #[allow(dead_code)] // FIXME
 #[derive(Debug, Clone)]
 
-struct Constellation<'a> {
-    name: Option<String>,
-    lines: Vec<Polyline<&'a OSBSCStar>>,
+pub struct Constellation<'a> {
+    pub name: Option<String>,
+    pub lines: Vec<Polyline<&'a OSBSCStar>>,
 }
 
+/// WIP Parse Open Source Constellation Catalog
 #[macro_export]
 macro_rules! parse_constellation_catalog {
     ($path:expr, $stars:expr) => {{
