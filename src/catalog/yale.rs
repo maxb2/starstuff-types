@@ -157,7 +157,10 @@ Note on n_RadVel:
 
 */
 use super::ValidParse;
-use crate::{parse_trim, utils::{FetchResult, fetch_gz_url, fetch_url}};
+use crate::{
+    parse_trim,
+    utils::{fetch_gz_url, fetch_url, FetchResult},
+};
 
 #[allow(non_snake_case)] // Copying field names from original data source
 #[derive(Debug, Clone)]

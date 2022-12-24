@@ -4,7 +4,7 @@
 use super::ValidParse;
 use crate::angle::{Dms, Hms, Sign};
 use crate::parse_trim;
-use crate::utils::{FetchResult, fetch_url};
+use crate::utils::{fetch_url, FetchResult};
 
 /// Parse an arc/minute/second field.
 macro_rules! parse_ams {
@@ -239,8 +239,7 @@ impl ValidParse for OSBSCStar {
 }
 
 pub fn fetch_osbsc() -> FetchResult<()> {
-    if !std::path::Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8").exists()
-    {
+    if !std::path::Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8").exists() {
         let dir = "data/OSBSC/";
 
         std::fs::create_dir_all(dir).unwrap();
