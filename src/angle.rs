@@ -95,7 +95,7 @@ pub enum Sign {
 
 /// Sexagesimal Degree
 #[derive(Debug, PartialEq, Clone)]
-pub struct Dms(
+pub struct DegMinSec(
     /// Sign of angle
     pub Sign,
     /// Degrees
@@ -108,7 +108,7 @@ pub struct Dms(
 
 /// Sexagesimal Hour
 #[derive(Debug, PartialEq, Clone)]
-pub struct Hms(
+pub struct HourMinSec(
     /// Sign of angle
     pub Sign,
     /// Hours
@@ -128,18 +128,15 @@ Angle to sexagesimal angle implementation
 macro_rules! impl_arc_minute_second {
     ($T:ty) => {
         impl $T {
-            pub fn new(sign: Sign, major: u32, minute: u32, second: f64) -> Self {
-                Self(sign, major, minute, second)
-            }
-            pub fn angle_to_ams(decimal: f64) -> Self
-            where
-                Self: std::marker::Sized,
-            {
-                let major: u32 = decimal as u32;
-                let min: f64 = (decimal - (major as f64)) * 60.0;
+            /**
+            Decimal angle to Arc Minute Second struct.
+            */
+            pub fn angle_to_ams(decimal_angle: f64) -> Self {
+                let major: u32 = decimal_angle as u32;
+                let min: f64 = (decimal_angle - (major as f64)) * 60.0;
                 let second: f64 = (min - (min as u32 as f64)) * 60.0;
-                Self::new(
-                    if decimal.is_sign_positive() {
+                Self(
+                    if decimal_angle.is_sign_positive() {
                         Sign::Positive
                     } else {
                         Sign::Negative
@@ -153,23 +150,23 @@ macro_rules! impl_arc_minute_second {
     };
 }
 
-impl_arc_minute_second!(Dms);
-impl_arc_minute_second!(Hms);
+impl_arc_minute_second!(DegMinSec);
+impl_arc_minute_second!(HourMinSec);
 
-impl From<Angle> for Dms {
+impl From<Angle> for DegMinSec {
     fn from(angle: Angle) -> Self {
         Self::angle_to_ams(angle.to_deg())
     }
 }
 
-impl From<Angle> for Hms {
+impl From<Angle> for HourMinSec {
     fn from(angle: Angle) -> Self {
         Self::angle_to_ams(angle.to_hr())
     }
 }
 
-impl From<Dms> for Angle {
-    fn from(angle: Dms) -> Angle {
+impl From<DegMinSec> for Angle {
+    fn from(angle: DegMinSec) -> Angle {
         let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 / 3600.0;
         match angle.0 {
             Sign::Positive => Angle::Degree(angle_abs),
@@ -178,8 +175,8 @@ impl From<Dms> for Angle {
     }
 }
 
-impl From<Hms> for Angle {
-    fn from(angle: Hms) -> Angle {
+impl From<HourMinSec> for Angle {
+    fn from(angle: HourMinSec) -> Angle {
         let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 / 3600.0;
         match angle.0 {
             Sign::Positive => Angle::Hour(angle_abs),
@@ -213,63 +210,63 @@ mod tests {
 
     #[test]
     fn test_ams() {
-        // Dms
+        // DegMinSec
         assert_eq!(
-            Dms::from(Angle::Degree(0.0)),
-            Dms::new(Sign::Positive, 0, 0, 0.0)
+            DegMinSec::from(Angle::Degree(0.0)),
+            DegMinSec(Sign::Positive, 0, 0, 0.0)
         );
         assert_eq!(
-            Dms::from(Angle::Degree(-0.0)),
-            Dms::new(Sign::Negative, 0, 0, 0.0)
+            DegMinSec::from(Angle::Degree(-0.0)),
+            DegMinSec(Sign::Negative, 0, 0, 0.0)
         );
         assert_eq!(
-            Dms::from(Angle::Degree(180.0)),
-            Dms::new(Sign::Positive, 180, 0, 0.0)
+            DegMinSec::from(Angle::Degree(180.0)),
+            DegMinSec(Sign::Positive, 180, 0, 0.0)
         );
         assert_eq!(
-            Dms::from(Angle::Radian(0.0)),
-            Dms::new(Sign::Positive, 0, 0, 0.0)
+            DegMinSec::from(Angle::Radian(0.0)),
+            DegMinSec(Sign::Positive, 0, 0, 0.0)
         );
         assert_eq!(
-            Dms::from(Angle::Radian(-0.0)),
-            Dms::new(Sign::Negative, 0, 0, 0.0)
+            DegMinSec::from(Angle::Radian(-0.0)),
+            DegMinSec(Sign::Negative, 0, 0, 0.0)
         );
         assert_eq!(
-            Dms::from(Angle::Radian(PI)),
-            Dms::new(Sign::Positive, 180, 0, 0.0)
+            DegMinSec::from(Angle::Radian(PI)),
+            DegMinSec(Sign::Positive, 180, 0, 0.0)
         );
         assert_eq!(
-            Dms::from(Angle::Hour(12.0)),
-            Dms::new(Sign::Positive, 180, 0, 0.0)
+            DegMinSec::from(Angle::Hour(12.0)),
+            DegMinSec(Sign::Positive, 180, 0, 0.0)
         );
-        // Hms
+        // HourMinSec
         assert_eq!(
-            Hms::from(Angle::Degree(0.0)),
-            Hms::new(Sign::Positive, 0, 0, 0.0)
-        );
-        assert_eq!(
-            Hms::from(Angle::Degree(-0.0)),
-            Hms::new(Sign::Negative, 0, 0, 0.0)
+            HourMinSec::from(Angle::Degree(0.0)),
+            HourMinSec(Sign::Positive, 0, 0, 0.0)
         );
         assert_eq!(
-            Hms::from(Angle::Hour(12.0)),
-            Hms::new(Sign::Positive, 12, 0, 0.0)
+            HourMinSec::from(Angle::Degree(-0.0)),
+            HourMinSec(Sign::Negative, 0, 0, 0.0)
         );
         assert_eq!(
-            Hms::from(Angle::Radian(0.0)),
-            Hms::new(Sign::Positive, 0, 0, 0.0)
+            HourMinSec::from(Angle::Hour(12.0)),
+            HourMinSec(Sign::Positive, 12, 0, 0.0)
         );
         assert_eq!(
-            Hms::from(Angle::Radian(-0.0)),
-            Hms::new(Sign::Negative, 0, 0, 0.0)
+            HourMinSec::from(Angle::Radian(0.0)),
+            HourMinSec(Sign::Positive, 0, 0, 0.0)
         );
         assert_eq!(
-            Hms::from(Angle::Radian(PI)),
-            Hms::new(Sign::Positive, 12, 0, 0.0)
+            HourMinSec::from(Angle::Radian(-0.0)),
+            HourMinSec(Sign::Negative, 0, 0, 0.0)
         );
         assert_eq!(
-            Hms::from(Angle::Degree(180.0)),
-            Hms::new(Sign::Positive, 12, 0, 0.0)
+            HourMinSec::from(Angle::Radian(PI)),
+            HourMinSec(Sign::Positive, 12, 0, 0.0)
+        );
+        assert_eq!(
+            HourMinSec::from(Angle::Degree(180.0)),
+            HourMinSec(Sign::Positive, 12, 0, 0.0)
         );
     }
     // TODO: test trig functions

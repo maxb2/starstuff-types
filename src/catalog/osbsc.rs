@@ -4,7 +4,7 @@
 > NOTE: run the `get_data.sh` script to get the tests to pass.
 */
 use super::ValidParse;
-use crate::angle::{Dms, Hms, Sign};
+use crate::angle::{DegMinSec, HourMinSec, Sign};
 use crate::parse_trim;
 
 /// Parse an arc/minute/second field.
@@ -12,7 +12,7 @@ macro_rules! parse_ams {
     // Hour/Minute/Second
     (hms, $s:expr) => {{
         let fields: Vec<&str> = $s.split("_").collect();
-        Some(Hms::new(
+        Some(HourMinSec(
             Sign::Positive,
             parse_trim!(u32, fields[0]).unwrap(),
             parse_trim!(u32, fields[1]).unwrap(),
@@ -27,7 +27,7 @@ macro_rules! parse_ams {
             "-" => Sign::Negative,
             _ => panic!(),
         };
-        Some(Dms::new(
+        Some(DegMinSec(
             sign,
             parse_trim!(u32, fields[0][1..]).unwrap(),
             parse_trim!(u32, fields[1]).unwrap(),
@@ -63,7 +63,7 @@ pub struct OSBSCStar {
     - An underscore is used to separate the parts.
     - Calculated from the radians in field 04. Included for convenience.
     */
-    pub right_ascension_hms: Option<crate::angle::Hms>,
+    pub right_ascension_hms: Option<crate::angle::HourMinSec>,
 
     /** 03: declination degrees minutes seconds, ICRS \[27,16\]
 
@@ -71,7 +71,7 @@ pub struct OSBSCStar {
     - An underscore is used to separate the parts.
     - Calculated from the radians in field 05. Included for convenience.
     */
-    pub declination_dms: Option<crate::angle::Dms>,
+    pub declination_dms: Option<crate::angle::DegMinSec>,
 
     /** 04: right ascension in radians, ICRS. \[45,12\]
 

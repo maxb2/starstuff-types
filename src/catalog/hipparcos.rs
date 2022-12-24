@@ -375,7 +375,7 @@ H77         r_SpType   Spect_Type_Source  /Source of spectral type
 
 */
 use super::ValidParse;
-use crate::angle::{Angle, Dms, Hms, Sign};
+use crate::angle::{Angle, DegMinSec, HourMinSec, Sign};
 use crate::coord::{Declination, RightAscension};
 
 use std::convert::TryFrom;
@@ -401,7 +401,7 @@ macro_rules! parse_hipparcos_field {
     // Right ascension from "hh mm ss.s"
     (ra_hms, $s:expr) => {{
         let fields: Vec<&str> = $s.split(" ").collect();
-        RightAscension(Angle::from(Hms::new(
+        RightAscension(Angle::from(HourMinSec(
             Sign::Positive,
             parse_hipparcos_field!(u32, fields[0]).unwrap(),
             parse_hipparcos_field!(u32, fields[1]).unwrap(),
@@ -416,7 +416,7 @@ macro_rules! parse_hipparcos_field {
             "-" => Sign::Negative,
             _ => panic!(),
         };
-        Declination(Angle::from(Dms::new(
+        Declination(Angle::from(DegMinSec(
             sign,
             parse_hipparcos_field!(u32, fields[0][1..]).unwrap(),
             parse_hipparcos_field!(u32, fields[1]).unwrap(),
