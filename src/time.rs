@@ -4,8 +4,7 @@ Astonomical time types and utilities
 
 use crate::angle::{Angle, TWO_PI};
 
-pub use chrono::DateTime;
-use chrono::{Datelike, Timelike, Utc};
+use chrono::{DateTime, Datelike, Timelike, Utc};
 
 /**
 Earth Rotation Angle
