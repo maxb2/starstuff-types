@@ -135,7 +135,7 @@ mod tests {
         if !std::path::Path::new(&data_file).exists() {
             panic!("File \"{}\" doesn't exist. Please run \"get_data.sh\" to fetch the data required for this test.", &data_file)
         };
-        
+
         let _stars = parse_catalog!(
             OSBSCStar,
             Path::new(&data_file),
@@ -156,10 +156,7 @@ mod tests {
             panic!("File \"{}\" doesn't exist. Please run \"get_data.sh\" to fetch the data required for this test.", &data_file)
         };
 
-        let constells = parse_constellation_catalog!(
-            Path::new(&data_file),
-            _star_map
-        );
+        let constells = parse_constellation_catalog!(Path::new(&data_file), _star_map);
 
         println!("Number of Constellations: {}", constells.len());
         println!("{:?}", constells.first());

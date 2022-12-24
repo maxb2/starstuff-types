@@ -788,11 +788,7 @@ mod tests {
             panic!("File \"{}\" doesn't exist. Please run \"get_data.sh\" to fetch the data required for this test.", &data_file)
         };
 
-        let _stars = parse_catalog!(
-            HipparcosStar,
-            Path::new(&data_file),
-            None
-        );
+        let _stars = parse_catalog!(HipparcosStar, Path::new(&data_file), None);
         println!("Number of stars: {}", _stars.len());
         println!("Last Star: {:?}", _stars.last().unwrap());
     }
