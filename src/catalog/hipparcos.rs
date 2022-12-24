@@ -782,9 +782,15 @@ mod tests {
     #[test]
     #[ignore]
     fn test_catalog() {
+        let data_file = "data/Hipparcos/hip_main.dat";
+
+        if !std::path::Path::new(&data_file).exists() {
+            panic!("File \"{}\" doesn't exist. Please run \"get_data.sh\" to fetch the data required for this test.", &data_file)
+        };
+
         let _stars = parse_catalog!(
             HipparcosStar,
-            Path::new("data/Hipparcos/hip_main.dat"),
+            Path::new(&data_file),
             None
         );
         println!("Number of stars: {}", _stars.len());

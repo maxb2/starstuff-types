@@ -418,7 +418,13 @@ mod tests {
     #[test]
     #[ignore]
     fn test_catalog() {
-        let _stars = parse_catalog!(YaleStar, Path::new("data/Yale/bsc5.dat"), Some(197));
+        let data_file = "data/Yale/bsc5.dat";
+
+        if !std::path::Path::new(&data_file).exists() {
+            panic!("File \"{}\" doesn't exist. Please run \"get_data.sh\" to fetch the data required for this test.", &data_file)
+        };
+
+        let _stars = parse_catalog!(YaleStar, Path::new(&data_file), Some(197));
         println!("Number of stars: {}", _stars.len());
         println!("Last Star: {:?}", _stars.last().unwrap());
     }

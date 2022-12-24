@@ -83,9 +83,15 @@ mod tests {
     #[test]
     #[ignore]
     fn test_constellations_1() {
+        let data_file = "data/OSBSC/os-bright-star-catalog-hip.utf8";
+
+        if !std::path::Path::new(&data_file).exists() {
+            panic!("File \"{}\" doesn't exist. Please run \"get_data.sh\" to fetch the data required for this test.", &data_file)
+        };
+
         let _stars = parse_catalog!(
             OSBSCStar,
-            Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
+            Path::new(&data_file),
             // NOTE: it seems like we don't need to pad this catalog even though it has no delimiters.
             // In case it breaks in the future: Some(262)
             None
@@ -124,9 +130,15 @@ mod tests {
     #[test]
     #[ignore]
     fn test_constellations_2() {
+        let data_file = "data/OSBSC/os-bright-star-catalog-hip.utf8";
+
+        if !std::path::Path::new(&data_file).exists() {
+            panic!("File \"{}\" doesn't exist. Please run \"get_data.sh\" to fetch the data required for this test.", &data_file)
+        };
+        
         let _stars = parse_catalog!(
             OSBSCStar,
-            Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
+            Path::new(&data_file),
             // NOTE: it seems like we don't need to pad this catalog even though it has no delimiters.
             // In case it breaks in the future: Some(262)
             None
@@ -138,8 +150,14 @@ mod tests {
             _star_map.insert(star.Hipparcos_id.unwrap(), star);
         }
 
+        let data_file = "data/OSBSC/constellation-lines-hip.utf8";
+
+        if !std::path::Path::new(&data_file).exists() {
+            panic!("File \"{}\" doesn't exist. Please run \"get_data.sh\" to fetch the data required for this test.", &data_file)
+        };
+
         let constells = parse_constellation_catalog!(
-            Path::new("data/OSBSC/constellation-lines-hip.utf8"),
+            Path::new(&data_file),
             _star_map
         );
 
