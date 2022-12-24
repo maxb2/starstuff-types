@@ -170,7 +170,7 @@ impl From<Angle> for Hms {
 
 impl From<Dms> for Angle {
     fn from(angle: Dms) -> Angle {
-        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
+        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 / 3600.0;
         match angle.0 {
             Sign::Positive => Angle::Degree(angle_abs),
             Sign::Negative => Angle::Degree(-angle_abs),
@@ -180,7 +180,7 @@ impl From<Dms> for Angle {
 
 impl From<Hms> for Angle {
     fn from(angle: Hms) -> Angle {
-        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 as f64 / 3600.0;
+        let angle_abs: f64 = angle.1 as f64 + angle.2 as f64 / 60.0 + angle.3 / 3600.0;
         match angle.0 {
             Sign::Positive => Angle::Hour(angle_abs),
             Sign::Negative => Angle::Hour(-angle_abs),
