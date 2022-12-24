@@ -251,6 +251,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_catalog() {
         let _stars = parse_catalog!(
             OSBSCStar,

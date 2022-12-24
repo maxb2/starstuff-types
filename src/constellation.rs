@@ -81,7 +81,8 @@ mod tests {
     use crate::parse_catalog;
 
     #[test]
-    fn test_1() {
+    #[ignore]
+    fn test_constellations_1() {
         let _stars = parse_catalog!(
             OSBSCStar,
             Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
@@ -121,7 +122,8 @@ mod tests {
     }
 
     #[test]
-    fn test_2() {
+    #[ignore]
+    fn test_constellations_2() {
         let _stars = parse_catalog!(
             OSBSCStar,
             Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),

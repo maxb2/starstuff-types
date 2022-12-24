@@ -12,4 +12,4 @@ jobs:
         run: ./get_data.sh
       - uses: icepuma/rust-action@master
         with:
-          args: cargo fmt -- --check && cargo clippy -- -Dwarnings && cargo test
+          args: cargo fmt -- --check && cargo clippy -- -Dwarnings && cargo test -- --include-ignored
