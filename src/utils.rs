@@ -1,13 +1,13 @@
 /*!
- Utility functions
- */
+Utility functions
+*/
 
 use flate2::read::GzDecoder;
 
 /**
- Fetch function result.
- Allows a dynamic error type so we don't have to explicitly coerce upstream errors to the local one.
- */
+Fetch function result.
+Allows a dynamic error type so we don't have to explicitly coerce upstream errors to the local one.
+*/
 pub type FetchResult<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 /** Fetch a file from url.
