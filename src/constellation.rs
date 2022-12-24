@@ -4,7 +4,7 @@ WIP Open Source Constellation Catalog Parser
 > NOTE: still under construction!
  */
 
-use crate::catalog::osbsc::OSBSCStar;
+use crate::{catalog::osbsc::OSBSCStar, utils::{FetchResult, fetch_url}};
 
 /// Polyline
 #[allow(dead_code)] // FIXME
@@ -72,6 +72,22 @@ macro_rules! parse_constellation_catalog {
     }};
 }
 
+pub fn fetch_constellations() -> FetchResult<()> {
+    if 
+       !std::path::Path::new("data/OSBSC/constellation-lines-hip.utf8").exists()
+    {
+        let dir = "data/OSBSC/";
+
+        std::fs::create_dir_all(dir).unwrap();
+
+        fetch_url(
+        "https://github.com/johanley/constellation-lines/raw/master/output/constellation-lines-hip.utf8".to_string(),
+        "data/OSBSC/constellation-lines-hip.utf8".to_string(),
+    )?;
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
@@ -83,6 +99,9 @@ mod tests {
     #[test]
     #[ignore]
     fn test_constellations_1() {
+
+        crate::catalog::osbsc::fetch_osbsc().unwrap();
+
         let _stars = parse_catalog!(
             OSBSCStar,
             Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
@@ -124,6 +143,9 @@ mod tests {
     #[test]
     #[ignore]
     fn test_constellations_2() {
+
+        crate::catalog::osbsc::fetch_osbsc().unwrap();
+
         let _stars = parse_catalog!(
             OSBSCStar,
             Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
@@ -137,6 +159,8 @@ mod tests {
         for star in _stars {
             _star_map.insert(star.Hipparcos_id.unwrap(), star);
         }
+
+        fetch_constellations().unwrap();
 
         let constells = parse_constellation_catalog!(
             Path::new("data/OSBSC/constellation-lines-hip.utf8"),

@@ -1,11 +1,10 @@
 /*!
 [Open Source Bright Star Catalog](https://github.com/johanley/star-catalog) parser
-
-> NOTE: run the `get_data.sh` script to get the tests to pass.
 */
 use super::ValidParse;
 use crate::angle::{Dms, Hms, Sign};
 use crate::parse_trim;
+use crate::utils::{FetchResult, fetch_url};
 
 /// Parse an arc/minute/second field.
 macro_rules! parse_ams {
@@ -239,6 +238,25 @@ impl ValidParse for OSBSCStar {
     }
 }
 
+pub fn fetch_osbsc() -> FetchResult<()> {
+    if !std::path::Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8").exists()
+    {
+        let dir = "data/OSBSC/";
+
+        std::fs::create_dir_all(dir).unwrap();
+
+        fetch_url(
+        "https://github.com/johanley/star-catalog/raw/master/catalogs/output/open-source-bsc/ReadMe.utf8".to_string(),
+        "data/OSBSC/ReadMe.utf8".to_string(),
+    )?;
+        fetch_url(
+        "https://github.com/johanley/star-catalog/raw/master/catalogs/output/open-source-bsc/os-bright-star-catalog-hip.utf8".to_string(),
+        "data/OSBSC/os-bright-star-catalog-hip.utf8".to_string(),
+    )?;
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use crate::catalog::osbsc::*;
@@ -253,6 +271,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_catalog() {
+        fetch_osbsc().unwrap();
         let _stars = parse_catalog!(
             OSBSCStar,
             Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),

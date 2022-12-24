@@ -1,7 +1,5 @@
 /*!  [Yale Bright Star Catalog](http://tdc-www.harvard.edu/catalogs/bsc5.html) parser
 
-> NOTE: run the `get_data.sh` script to get the tests to pass.
-
 The Bright Star Catalogue,  5th Revised Ed. (Preliminary Version)
 
 - Hoffleit D., Warren Jr W.H.
@@ -159,7 +157,7 @@ Note on n_RadVel:
 
 */
 use super::ValidParse;
-use crate::parse_trim;
+use crate::{parse_trim, utils::{FetchResult, fetch_gz_url, fetch_url}};
 
 #[allow(non_snake_case)] // Copying field names from original data source
 #[derive(Debug, Clone)]
@@ -404,6 +402,29 @@ impl ValidParse for YaleStar {
     }
 }
 
+pub fn fetch_yale() -> FetchResult<()> {
+    if !std::path::Path::new("data/Yale/bsc5.dat").exists() {
+        let dir = "data/Yale/";
+
+        std::fs::create_dir_all(dir).unwrap();
+
+        fetch_gz_url(
+            "http://tdc-www.harvard.edu/catalogs/bsc5.dat.gz".to_string(),
+            "data/Yale/bsc5.dat".to_string(),
+        )?;
+        fetch_url(
+            "http://tdc-www.harvard.edu/catalogs/bsc5.readme".to_string(),
+            "data/Yale/bsc5.readme".to_string(),
+        )?;
+        fetch_gz_url(
+            "http://tdc-www.harvard.edu/catalogs/bsc5.notes.gz".to_string(),
+            "data/Yale/bsc5.notes".to_string(),
+        )?;
+        // TODO: gunzip the files
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use crate::catalog::yale::*;
@@ -418,6 +439,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_catalog() {
+        fetch_yale().unwrap();
         let _stars = parse_catalog!(YaleStar, Path::new("data/Yale/bsc5.dat"), Some(197));
         println!("Number of stars: {}", _stars.len());
         println!("Last Star: {:?}", _stars.last().unwrap());
