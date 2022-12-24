@@ -13,5 +13,7 @@ exclude = ["data/*"]
 
 [dependencies]
 chrono = "0.4"
+flate2 = "1.0"
+reqwest = { version = "0", features = ["blocking"] }
 auto_ops = "0.3"
 assert_float_eq = "1"

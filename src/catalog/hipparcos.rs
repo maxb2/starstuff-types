@@ -1,7 +1,5 @@
 /*! # [Hipparcos Catalog](https://heasarc.gsfc.nasa.gov/W3Browse/all/hipparcos.html) parser
 
-> NOTE: run the `get_data.sh` script to get the tests to pass.
-
 ## [The Hipparcos and Tycho Catalogues](https://heasarc.gsfc.nasa.gov/W3Browse/all/hipparcos.html) (ESA 1997)
 
 - ESA 1997
@@ -377,6 +375,7 @@ H77         r_SpType   Spect_Type_Source  /Source of spectral type
 use super::ValidParse;
 use crate::angle::{Angle, Dms, Hms, Sign};
 use crate::coord::{Declination, RightAscension};
+use crate::utils::{fetch_url, FetchResult};
 
 use std::convert::TryFrom;
 
@@ -768,6 +767,25 @@ impl ValidParse for HipparcosStar {
     }
 }
 
+pub fn fetch_hipparcos() -> FetchResult<()> {
+    if !std::path::Path::new("data/Hipparcos/hip_main.dat").exists() {
+        let dir = "data/Hipparcos/";
+
+        std::fs::create_dir_all(dir).unwrap();
+
+        fetch_url(
+            "https://cdsarc.cds.unistra.fr/ftp/cats/I/239/hip_main.dat".to_string(),
+            "data/Hipparcos/hip_main.dat".to_string(),
+        )?;
+        fetch_url(
+            "https://cdsarc.cds.unistra.fr/ftp/cats/I/239/ReadMe".to_string(),
+            "data/Hipparcos/ReadMe".to_string(),
+        )?;
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use crate::catalog::hipparcos::*;
@@ -782,6 +800,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_catalog() {
+        fetch_hipparcos().unwrap();
         let _stars = parse_catalog!(
             HipparcosStar,
             Path::new("data/Hipparcos/hip_main.dat"),
