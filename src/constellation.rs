@@ -82,7 +82,7 @@ mod tests {
 
     #[test]
     #[ignore]
-    fn test_constellations_1() {
+    fn constellations_1() {
         let data_file = "data/OSBSC/os-bright-star-catalog-hip.utf8";
 
         if !std::path::Path::new(&data_file).exists() {
@@ -129,7 +129,7 @@ mod tests {
 
     #[test]
     #[ignore]
-    fn test_constellations_2() {
+    fn constellations_2() {
         let data_file = "data/OSBSC/os-bright-star-catalog-hip.utf8";
 
         if !std::path::Path::new(&data_file).exists() {

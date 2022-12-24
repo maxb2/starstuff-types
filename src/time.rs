@@ -76,7 +76,7 @@ mod tests {
     use crate::time::*;
 
     #[test]
-    fn test_juliandate() {
+    fn juliandate() {
         // From: https://en.wikipedia.org/wiki/Epoch_(astronomy)#J2000
         // Definition of J2000 epoch
         assert_eq!(

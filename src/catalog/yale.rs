@@ -410,14 +410,14 @@ mod tests {
     use crate::parse_catalog;
 
     #[test]
-    fn test_yalestar_from() {
+    fn yalestar_from() {
         let s = String::from("   1          BD+44 4550      3 36042          46           000001.1+444022000509.9+451345114.44-16.88 6.70  +0.07 +0.08         A1Vn               -0.012-0.018      -018      195  4.2  21.6AC   3 ");
         YaleStar::try_from(s).unwrap();
     }
 
     #[test]
     #[ignore]
-    fn test_catalog() {
+    fn catalog() {
         let data_file = "data/Yale/bsc5.dat";
 
         if !std::path::Path::new(&data_file).exists() {

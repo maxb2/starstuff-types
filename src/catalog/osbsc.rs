@@ -245,14 +245,14 @@ mod tests {
     use crate::parse_catalog;
 
     #[test]
-    fn test_osbscstar_from() {
+    fn osbscstar_from() {
         let s = String::from("    88  00_01_04.5982692  -48_48_35.492919  0.0046977187  -0.8518927495    5.50   -18.36    -5.82     8.0   0.26   0.29   0.48   0.46   0.38   0.7  5.71          G8III  0.911              224834 9081   τ Phe                        Phe BHHAAAAACAAAAACB-BB--BEE--H ");
         OSBSCStar::try_from(s).unwrap();
     }
 
     #[test]
     #[ignore]
-    fn test_catalog() {
+    fn catalog() {
         let data_file = "data/OSBSC/os-bright-star-catalog-hip.utf8";
 
         if !std::path::Path::new(&data_file).exists() {

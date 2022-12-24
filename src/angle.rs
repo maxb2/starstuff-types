@@ -193,7 +193,8 @@ mod tests {
     const PI_SIXTH: f64 = PI / 6.0;
 
     #[test]
-    fn test_angle() {
+    fn angle_enum() {
+        // converting between types
         assert_float_absolute_eq!(
             Angle::Degree(90.0).to_deg(),
             Angle::Radian(PI_HALF).to_deg()
@@ -206,10 +207,51 @@ mod tests {
             Angle::Radian(PI_HALF).to_deg(),
             Angle::Degree(90.0).to_deg()
         );
+
+        // trigonometry
+        assert_float_absolute_eq!(1.0, Angle::Degree(0.0).cos());
+        assert_float_absolute_eq!(1.0, Angle::Hour(0.0).cos());
+        assert_float_absolute_eq!(1.0, Angle::Radian(0.0).cos());
+
+        assert_float_absolute_eq!(0.0, Angle::Degree(90.0).cos());
+        assert_float_absolute_eq!(0.0, Angle::Hour(6.0).cos());
+        assert_float_absolute_eq!(0.0, Angle::Radian(PI_HALF).cos());
+
+        assert_float_absolute_eq!(0.5, Angle::Degree(60.0).cos());
+        assert_float_absolute_eq!(0.5, Angle::Hour(4.0).cos());
+        assert_float_absolute_eq!(0.5, Angle::Radian(PI_THIRD).cos());
+
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Degree(45.0).cos());
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Hour(3.0).cos());
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Radian(PI_FOURTH).cos());
+
+        assert_float_absolute_eq!(0.0, Angle::Degree(0.0).sin());
+        assert_float_absolute_eq!(0.0, Angle::Hour(0.0).sin());
+        assert_float_absolute_eq!(0.0, Angle::Radian(0.0).sin());
+
+        assert_float_absolute_eq!(1.0, Angle::Degree(90.0).sin());
+        assert_float_absolute_eq!(1.0, Angle::Hour(6.0).sin());
+        assert_float_absolute_eq!(1.0, Angle::Radian(PI_HALF).sin());
+
+        assert_float_absolute_eq!(3_f64.sqrt() / 2.0, Angle::Degree(60.0).sin());
+        assert_float_absolute_eq!(3_f64.sqrt() / 2.0, Angle::Hour(4.0).sin());
+        assert_float_absolute_eq!(3_f64.sqrt() / 2.0, Angle::Radian(PI_THIRD).sin());
+
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Degree(45.0).sin());
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Hour(3.0).sin());
+        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Radian(PI_FOURTH).sin());
+
+        assert_float_absolute_eq!(0.5, Angle::Degree(30.0).sin());
+        assert_float_absolute_eq!(0.5, Angle::Hour(2.0).sin());
+        assert_float_absolute_eq!(0.5, Angle::Radian(PI_SIXTH).sin());
+
+        assert_float_absolute_eq!(1.0, Angle::Degree(45.0).tan());
+        assert_float_absolute_eq!(1.0, Angle::Hour(3.0).tan());
+        assert_float_absolute_eq!(1.0, Angle::Radian(PI_FOURTH).tan());
     }
 
     #[test]
-    fn test_ams() {
+    fn arc_min_sec() {
         // DegMinSec
         assert_eq!(
             DegMinSec::from(Angle::Degree(0.0)),
@@ -268,49 +310,5 @@ mod tests {
             HourMinSec::from(Angle::Degree(180.0)),
             HourMinSec(Sign::Positive, 12, 0, 0.0)
         );
-    }
-    // TODO: test trig functions
-
-    #[test]
-    fn test_trig() {
-        assert_float_absolute_eq!(1.0, Angle::Degree(0.0).cos());
-        assert_float_absolute_eq!(1.0, Angle::Hour(0.0).cos());
-        assert_float_absolute_eq!(1.0, Angle::Radian(0.0).cos());
-
-        assert_float_absolute_eq!(0.0, Angle::Degree(90.0).cos());
-        assert_float_absolute_eq!(0.0, Angle::Hour(6.0).cos());
-        assert_float_absolute_eq!(0.0, Angle::Radian(PI_HALF).cos());
-
-        assert_float_absolute_eq!(0.5, Angle::Degree(60.0).cos());
-        assert_float_absolute_eq!(0.5, Angle::Hour(4.0).cos());
-        assert_float_absolute_eq!(0.5, Angle::Radian(PI_THIRD).cos());
-
-        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Degree(45.0).cos());
-        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Hour(3.0).cos());
-        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Radian(PI_FOURTH).cos());
-
-        assert_float_absolute_eq!(0.0, Angle::Degree(0.0).sin());
-        assert_float_absolute_eq!(0.0, Angle::Hour(0.0).sin());
-        assert_float_absolute_eq!(0.0, Angle::Radian(0.0).sin());
-
-        assert_float_absolute_eq!(1.0, Angle::Degree(90.0).sin());
-        assert_float_absolute_eq!(1.0, Angle::Hour(6.0).sin());
-        assert_float_absolute_eq!(1.0, Angle::Radian(PI_HALF).sin());
-
-        assert_float_absolute_eq!(3_f64.sqrt() / 2.0, Angle::Degree(60.0).sin());
-        assert_float_absolute_eq!(3_f64.sqrt() / 2.0, Angle::Hour(4.0).sin());
-        assert_float_absolute_eq!(3_f64.sqrt() / 2.0, Angle::Radian(PI_THIRD).sin());
-
-        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Degree(45.0).sin());
-        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Hour(3.0).sin());
-        assert_float_absolute_eq!(2_f64.sqrt() / 2.0, Angle::Radian(PI_FOURTH).sin());
-
-        assert_float_absolute_eq!(0.5, Angle::Degree(30.0).sin());
-        assert_float_absolute_eq!(0.5, Angle::Hour(2.0).sin());
-        assert_float_absolute_eq!(0.5, Angle::Radian(PI_SIXTH).sin());
-
-        assert_float_absolute_eq!(1.0, Angle::Degree(45.0).tan());
-        assert_float_absolute_eq!(1.0, Angle::Hour(3.0).tan());
-        assert_float_absolute_eq!(1.0, Angle::Radian(PI_FOURTH).tan());
     }
 }

@@ -774,14 +774,14 @@ mod tests {
     use crate::parse_catalog;
 
     #[test]
-    fn test_hipparcosstar_from() {
+    fn hipparcosstar_from() {
         let s = String::from("H|           1| |00 00 00.22|+01 05 20.4| 9.10| |H|000.00091185|+01.08901332| |   3.54|   -5.20|   -1.88|  1.32|  0.74|  1.39|  1.36|  0.81| 0.32|-0.07|-0.11|-0.24| 0.09|-0.01| 0.10|-0.01| 0.01| 0.34|  0| 0.74|     1| 9.643|0.020| 9.130|0.019| | 0.482|0.025|T|0.55|0.03|L| | 9.2043|0.0020|0.017| 87| | 9.17| 9.24|       | | | |          | |  | 1| | | |  |   |       |     |     |    |S| | |224700|B+00 5077 |          |          |0.66|F5          |S");
         HipparcosStar::try_from(s).unwrap();
     }
 
     #[test]
     #[ignore]
-    fn test_catalog() {
+    fn catalog() {
         let data_file = "data/Hipparcos/hip_main.dat";
 
         if !std::path::Path::new(&data_file).exists() {
