@@ -1,12 +1,12 @@
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{alpha1, alphanumeric1, char, one_of, multispace0},
+    character::complete::{alpha1, alphanumeric1, char, multispace0, one_of},
     combinator::recognize,
-    multi::{many0, many0_count, many1, separated_list0},
-    sequence::{ pair, terminated, delimited},
-    IResult,
     error::ParseError,
+    multi::{many0, many0_count, many1, separated_list0},
+    sequence::{delimited, pair, terminated},
+    IResult,
 };
 
 /// A combinator that takes a parser `inner` and produces a parser that also consumes both leading and
@@ -32,7 +32,7 @@ pub fn identifier(input: &str) -> IResult<&str, &str> {
 #[derive(Debug)]
 pub struct Constellation {
     name: String,
-    lines: Vec<Vec<u32>>
+    lines: Vec<Vec<u32>>,
 }
 
 pub fn int_list(input: &str) -> IResult<&str, Vec<u32>> {
@@ -55,12 +55,16 @@ pub fn record(input: &str) -> IResult<&str, Constellation> {
     let (input, lines) = separated_list0(ws(char(';')), int_list)(input)?;
 
     match input {
-        "" => Ok((input, Constellation {name: String::from(name), lines})),
-        _ => panic!("found extra input while parsing: \"{}\"", input)
-        // TODO: get this error working
-        // _ => Err(nom::Err::Error(("123def", nom::error::ErrorKind::Alpha))) // NOTE: not working
+        "" => Ok((
+            input,
+            Constellation {
+                name: String::from(name),
+                lines,
+            },
+        )),
+        _ => panic!("found extra input while parsing: \"{}\"", input), // TODO: get this error working
+                                                                       // _ => Err(nom::Err::Error(("123def", nom::error::ErrorKind::Alpha))) // NOTE: not working
     }
-    
 }
 
 fn main() {
