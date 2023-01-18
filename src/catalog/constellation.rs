@@ -6,7 +6,7 @@ WIP Open Source Constellation Catalog Parser
 
 use crate::catalog::osbsc::OSBSCStar;
 
-use crate::catalog::parse::{ws, int_list, identifier};
+use crate::catalog::parse::{identifier, int_list, ws};
 
 use nom::{character::complete::char, multi::separated_list0, IResult};
 

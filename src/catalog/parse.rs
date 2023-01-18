@@ -15,7 +15,7 @@ use nom::{
     IResult,
 };
 
-/** 
+/**
 A combinator that takes a parser `inner` and produces a parser that also consumes both leading and
 trailing whitespace, returning the output of `inner`.
 
