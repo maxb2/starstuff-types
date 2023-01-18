@@ -1,7 +1,9 @@
 //! Star catalog parsers
 
+pub mod constellation;
 pub mod hipparcos;
 pub mod osbsc;
+pub mod parse;
 pub mod util;
 pub mod yale;
 

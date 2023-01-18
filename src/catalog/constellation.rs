@@ -6,6 +6,10 @@ WIP Open Source Constellation Catalog Parser
 
 use crate::catalog::osbsc::OSBSCStar;
 
+use crate::catalog::parse::{ws, int_list, identifier};
+
+use nom::{character::complete::char, multi::separated_list0, IResult};
+
 /// Polyline
 #[allow(dead_code)] // FIXME
 #[derive(Debug, Clone)]
@@ -16,10 +20,37 @@ pub struct Polyline<T> {
 /// Constellation
 #[allow(dead_code)] // FIXME
 #[derive(Debug, Clone)]
-
 pub struct Constellation<'a> {
     pub name: Option<String>,
     pub lines: Vec<Polyline<&'a OSBSCStar>>,
+}
+
+/// Parsed constellation
+#[derive(Debug)]
+pub struct ParsedConstellation<'a> {
+    name: String,
+    lines: Vec<Vec<&'a str>>,
+}
+
+/// Parse a record from constellation data file.
+pub fn parse_record(input: &str) -> IResult<&str, ParsedConstellation> {
+    let (input, name) = ws(identifier)(input)?;
+    let (input, _) = ws(char('='))(input)?;
+    let (input, lines) = separated_list0(ws(char(';')), int_list)(input)?;
+
+    match input {
+        "" => Ok((
+            input,
+            ParsedConstellation {
+                name: String::from(name),
+                lines,
+            },
+        )),
+        _ => Err(nom::Err::Error(nom::error::Error {
+            input: input,
+            code: nom::error::ErrorKind::Fail,
+        })),
+    }
 }
 
 /// WIP Parse Open Source Constellation Catalog
@@ -76,9 +107,17 @@ macro_rules! parse_constellation_catalog {
 mod tests {
     use std::collections::HashMap;
 
+    use crate::catalog::constellation::*;
     use crate::catalog::ValidParse;
-    use crate::constellation::*;
     use crate::parse_catalog;
+
+    #[test]
+    fn test_parser() {
+        let rec = "Psc = [123, 32131, 321321]; [31312, 54654645]";
+        let r = parse_record(&rec);
+        println!("{:#?}", r);
+        r.unwrap();
+    }
 
     #[test]
     fn test_1() {
