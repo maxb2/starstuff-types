@@ -7,12 +7,14 @@ Utilities for parsing catalog data files based on the [nom](https://docs.rs/nom/
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{alpha1, alphanumeric1, char, digit1, multispace0, one_of},
+    character::complete::{alpha1, alphanumeric1, char, digit1, multispace0, i32},
+    number::complete::double,
     combinator::recognize,
     error::ParseError,
-    multi::{many0, many0_count, many1, separated_list0},
-    sequence::{delimited, pair, terminated},
+    multi::{many0_count, separated_list0},
+    sequence::{delimited, pair},
     IResult,
+    sequence::tuple,
 };
 
 /**
@@ -28,14 +30,6 @@ where
     F: FnMut(&'a str) -> IResult<&'a str, O, E>,
 {
     delimited(multispace0, inner, multispace0)
-}
-
-/** Parse a decimal integer.
-
-<https://github.com/rust-bakery/nom/blob/main/doc/nom_recipes.md#decimal>
-*/
-pub fn decimal(input: &str) -> IResult<&str, &str> {
-    recognize(many1(terminated(one_of("0123456789"), many0(char('_')))))(input)
 }
 
 /** Parse a Rust-style identifier.
@@ -58,6 +52,29 @@ pub fn int_list(input: &str) -> IResult<&str, Vec<&str>> {
     Ok((input, str_list))
 }
 
-// pub fn sexagesimal(input: &str) -> IResult<&str, Vec<&str>> {
-//     separated_list0(tag("_"))(input)
-// }
+#[derive(Debug)]
+#[allow(dead_code)]
+pub struct ParsedSexagesimal {
+    major: i32,
+    minor: i32,
+    second: f64
+}
+
+pub fn sexagesimal(input: &str) -> IResult<&str, ParsedSexagesimal> {
+    let (input, (major, _, minor, _, second)) = tuple((ws(i32), char('_'), i32, char('_'), double))(input)?;
+
+    Ok((input, ParsedSexagesimal{major, minor, second}))
+}
+
+#[cfg(test)]
+mod tests {
+
+use super::*;
+
+#[test]
+fn test_sex() {
+    sexagesimal(" 43_56_19.123456").unwrap();
+    sexagesimal("-43_56_19.123456").unwrap();
+}
+
+}
