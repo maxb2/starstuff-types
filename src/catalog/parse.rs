@@ -7,7 +7,7 @@ Utilities for parsing catalog data files based on the [nom](https://docs.rs/nom/
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{alpha1, alphanumeric1, char, multispace0, one_of},
+    character::complete::{alpha1, alphanumeric1, char, digit1, multispace0, one_of},
     combinator::recognize,
     error::ParseError,
     multi::{many0, many0_count, many1, separated_list0},
@@ -34,7 +34,6 @@ where
 
 <https://github.com/rust-bakery/nom/blob/main/doc/nom_recipes.md#decimal>
 */
-
 pub fn decimal(input: &str) -> IResult<&str, &str> {
     recognize(many1(terminated(one_of("0123456789"), many0(char('_')))))(input)
 }
@@ -53,8 +52,12 @@ pub fn identifier(input: &str) -> IResult<&str, &str> {
 /// Parse a list of positive integers of the form `[0, 1, 2]`
 pub fn int_list(input: &str) -> IResult<&str, Vec<&str>> {
     let (input, _) = ws(char('['))(input)?;
-    let (input, str_list) = separated_list0(tag(","), ws(decimal))(input)?;
+    let (input, str_list) = separated_list0(tag(","), ws(digit1))(input)?;
     let (input, _) = ws(char(']'))(input)?;
 
     Ok((input, str_list))
 }
+
+// pub fn sexagesimal(input: &str) -> IResult<&str, Vec<&str>> {
+//     separated_list0(tag("_"))(input)
+// }

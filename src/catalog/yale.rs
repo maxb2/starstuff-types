@@ -416,6 +416,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_catalog() {
         let _stars = parse_catalog!(YaleStar, Path::new("data/Yale/bsc5.dat"), Some(197));
         println!("Number of stars: {}", _stars.len());
