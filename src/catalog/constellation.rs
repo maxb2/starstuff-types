@@ -26,6 +26,7 @@ pub struct Constellation<'a> {
 }
 
 /// Parsed constellation
+#[allow(dead_code)] // FIXME
 #[derive(Debug)]
 pub struct ParsedConstellation<'a> {
     name: String,
@@ -47,7 +48,7 @@ pub fn parse_record(input: &str) -> IResult<&str, ParsedConstellation> {
             },
         )),
         _ => Err(nom::Err::Error(nom::error::Error {
-            input: input,
+            input,
             code: nom::error::ErrorKind::Fail,
         })),
     }
