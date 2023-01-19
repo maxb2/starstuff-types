@@ -8,6 +8,7 @@ use crate::catalog::osbsc::OSBSCStar;
 
 use crate::catalog::parse::{identifier, int_list, ws};
 
+use nom::combinator::all_consuming;
 use nom::{character::complete::char, multi::separated_list0, IResult};
 
 /// Polyline
@@ -37,21 +38,15 @@ pub struct ParsedConstellation<'a> {
 pub fn parse_record(input: &str) -> IResult<&str, ParsedConstellation> {
     let (input, name) = ws(identifier)(input)?;
     let (input, _) = ws(char('='))(input)?;
-    let (input, lines) = separated_list0(ws(char(';')), int_list)(input)?;
+    let (input, lines) = all_consuming(separated_list0(ws(char(';')), int_list))(input)?;
 
-    match input {
-        "" => Ok((
-            input,
-            ParsedConstellation {
-                name: String::from(name),
-                lines,
-            },
-        )),
-        _ => Err(nom::Err::Error(nom::error::Error {
-            input,
-            code: nom::error::ErrorKind::Fail,
-        })),
-    }
+    Ok((
+        input,
+        ParsedConstellation {
+            name: String::from(name),
+            lines,
+        },
+    ))
 }
 
 /// WIP Parse Open Source Constellation Catalog
