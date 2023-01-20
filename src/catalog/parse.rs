@@ -56,9 +56,9 @@ pub fn int_list(input: &str) -> IResult<&str, Vec<&str>> {
 #[derive(Debug)]
 #[allow(dead_code)] // FIXME
 pub struct ParsedSexagesimal {
-    major: i32,
-    minor: i32,
-    second: f64,
+    pub major: i32,
+    pub minor: i32,
+    pub second: f64,
 }
 
 // TODO: make a higher order function that can take a delimiter
