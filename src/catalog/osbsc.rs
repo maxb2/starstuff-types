@@ -159,7 +159,7 @@ pub struct OSBSCStar {
     pub constellation: Field<String>,
 }
 
-/// Provenance of data
+/// Provenances of data.
 #[derive(Debug, Clone, Copy, Eq, Hash, PartialEq)]
 pub enum Provenance {
     /// Primary source for astrometry -  Hipparcos2
@@ -184,12 +184,14 @@ pub enum Provenance {
     None,
 }
 
+/// Data field with provenance.
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub struct Field<T> {
     value: T,
     provenance: Provenance,
 }
 
+/// Parse a provenance character.
 pub fn provenance(input: &str) -> IResult<&str, Provenance> {
     let (input, prov) = one_of("ABCDEFGHI-")(input)?;
 
