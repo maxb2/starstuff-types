@@ -101,11 +101,7 @@ macro_rules! parse_constellation_catalog {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
     use crate::catalog::constellation::*;
-    use crate::catalog::ValidParse;
-    use crate::parse_catalog;
 
     #[test]
     fn test_parser() {
@@ -113,71 +109,5 @@ mod tests {
         let r = parse_record(&rec);
         println!("{:#?}", r);
         r.unwrap();
-    }
-
-    #[test]
-    fn test_1() {
-        let _stars = parse_catalog!(
-            OSBSCStar,
-            Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
-            // NOTE: it seems like we don't need to pad this catalog even though it has no delimiters.
-            // In case it breaks in the future: Some(262)
-            None
-        );
-
-        let mut _star_map = HashMap::new();
-
-        for star in _stars {
-            _star_map.insert(star.Hipparcos_id.unwrap(), star);
-        }
-
-        let pline1 = Polyline {
-            lines: vec![
-                _star_map.get(&88).unwrap(),
-                _star_map.get(&107).unwrap(),
-                _star_map.get(&122).unwrap(),
-            ],
-        };
-
-        let pline2 = Polyline {
-            lines: vec![
-                _star_map.get(&145).unwrap(),
-                _star_map.get(&194).unwrap(),
-                _star_map.get(&418).unwrap(),
-            ],
-        };
-        let _con = Constellation {
-            name: Some(String::from("test")),
-            lines: vec![pline1, pline2],
-        };
-
-        println!("{:?}", _con);
-        // panic!()
-    }
-
-    #[test]
-    fn test_2() {
-        let _stars = parse_catalog!(
-            OSBSCStar,
-            Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
-            // NOTE: it seems like we don't need to pad this catalog even though it has no delimiters.
-            // In case it breaks in the future: Some(262)
-            None
-        );
-
-        let mut _star_map = HashMap::new();
-
-        for star in _stars {
-            _star_map.insert(star.Hipparcos_id.unwrap(), star);
-        }
-
-        let constells = parse_constellation_catalog!(
-            Path::new("data/OSBSC/constellation-lines-hip.utf8"),
-            _star_map
-        );
-
-        println!("Number of Constellations: {}", constells.len());
-        println!("{:?}", constells.first());
-        // panic!();
     }
 }

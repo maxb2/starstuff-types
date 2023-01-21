@@ -4,45 +4,15 @@
 > NOTE: run the `get_data.sh` script to get the tests to pass.
 */
 use super::parse::sexagesimal_underscore;
-use super::ValidParse;
 use crate::angle::{Dms, Hms, Sign};
 use crate::catalog::parse::ws;
-use crate::parse_trim;
 use nom::bytes::complete::take;
-use nom::character::complete::{multispace0, u32};
+use nom::character::complete::{multispace0, one_of, u32};
 use nom::combinator::{all_consuming, map_parser};
+use nom::multi::many1;
 use nom::number::complete::double;
 use nom::sequence::terminated;
 use nom::IResult;
-
-/// Parse an arc/minute/second field.
-macro_rules! parse_ams {
-    // Hour/Minute/Second
-    (hms, $s:expr) => {{
-        let fields: Vec<&str> = $s.split("_").collect();
-        Some(Hms::new(
-            Sign::Positive,
-            parse_trim!(u32, fields[0]).unwrap(),
-            parse_trim!(u32, fields[1]).unwrap(),
-            parse_trim!(f64, fields[2]).unwrap(),
-        ))
-    }};
-    // Degree/Minute/Second
-    (dms, $s:expr) => {{
-        let fields: Vec<&str> = $s.split("_").collect();
-        let sign: Sign = match &fields[0][0..1] {
-            " " => Sign::Positive,
-            "-" => Sign::Negative,
-            _ => panic!(),
-        };
-        Some(Dms::new(
-            sign,
-            parse_trim!(u32, fields[0][1..]).unwrap(),
-            parse_trim!(u32, fields[1]).unwrap(),
-            parse_trim!(f64, fields[2]).unwrap(),
-        ))
-    }};
-}
 
 impl From<i32> for Sign {
     fn from(x: i32) -> Self {
@@ -52,117 +22,6 @@ impl From<i32> for Sign {
             Self::Negative
         }
     }
-}
-
-/// Parse a record from OS Bright Star Catalog data file.
-pub fn parse_record(input: &str) -> IResult<&str, OSBSCStar> {
-    let (input, hipparcos_id) = map_parser(take(8usize), ws(u32))(input)?;
-
-    let (input, right_ascension_hms) =
-        map_parser(take(18usize), ws(sexagesimal_underscore))(input)?;
-
-    let (input, declination_dms) = map_parser(take(18usize), ws(sexagesimal_underscore))(input)?;
-
-    let (input, right_ascension_rad) = map_parser(take(14usize), ws(double))(input)?;
-
-    let (input, declination_rad) = map_parser(take(14usize), ws(double))(input)?;
-
-    let (input, parallax) = map_parser(take(8usize), ws(double))(input)?;
-
-    let (input, proper_motion_ra) = map_parser(take(9usize), ws(double))(input)?;
-
-    let (input, proper_motion_dec) = map_parser(take(9usize), ws(double))(input)?;
-
-    let (input, radial_velocity) = map_parser(take(8usize), ws(double))(input)?;
-
-    let (input, right_ascension_rad_err) = map_parser(take(7usize), ws(double))(input)?;
-
-    let (input, declination_rad_err) = map_parser(take(7usize), ws(double))(input)?;
-
-    let (input, parallax_err) = map_parser(take(7usize), ws(double))(input)?;
-
-    let (input, proper_motion_ra_err) = map_parser(take(7usize), ws(double))(input)?;
-
-    let (input, proper_motion_dec_err) = map_parser(take(7usize), ws(double))(input)?;
-
-    let (input, radial_velocity_err) = map_parser(take(6usize), ws(double))(input)?;
-
-    let (input, v_magnitude) = map_parser(take(6usize), ws(double))(input)?;
-
-    let (input, variability_flag) = take(2usize)(input)?;
-
-    let (input, spectral_type) = take(13usize)(input)?;
-
-    let (input, bv_magnitude) = map_parser(take(7usize), ws(double))(input)?;
-
-    let (input, multiplicity_flag) = take(2usize)(input)?;
-
-    let (input, ccdm_id) = take(11usize)(input)?;
-
-    let (input, hd_id) = map_parser(take(7usize), ws(u32))(input)?;
-
-    let (input, yale_id) = map_parser(take(5usize), ws(u32))(input)?;
-
-    let (input, bayer_id) = take(8usize)(input)?;
-
-    let (input, flamsteed_id) = take(8usize)(input)?;
-
-    let (input, proper_name) = take(15usize)(input)?;
-
-    let (input, constellation) = take(4usize)(input)?;
-
-    let (input, provenence) = all_consuming(terminated(take(27usize), multispace0))(input)?;
-
-    Ok((
-        input,
-        OSBSCStar {
-            Hipparcos_id: match hipparcos_id.try_into() {
-                Ok(x) => Some(x),
-                Err(_) => None,
-            },
-
-            right_ascension_hms: Some(Hms::new(
-                Sign::from(right_ascension_hms.major),
-                right_ascension_hms.major.unsigned_abs(),
-                right_ascension_hms.minor.unsigned_abs(),
-                right_ascension_hms.second,
-            )),
-            declination_dms: Some(Dms(
-                Sign::from(declination_dms.major),
-                declination_dms.major.unsigned_abs(),
-                declination_dms.minor.unsigned_abs(),
-                declination_dms.second,
-            )),
-            right_ascension_rad: Some(right_ascension_rad),
-            declination_rad: Some(declination_rad),
-            parallax: Some(parallax),
-            proper_motion_ra: Some(proper_motion_ra),
-            proper_motion_dec: Some(proper_motion_dec),
-            radial_velocity: Some(radial_velocity),
-            right_ascension_rad_err: Some(right_ascension_rad_err),
-            declination_rad_err: Some(declination_rad_err),
-            parallax_err: Some(parallax_err),
-            proper_motion_ra_err: Some(proper_motion_ra_err),
-            proper_motion_dec_err: Some(proper_motion_dec_err),
-            radial_velocity_err: Some(radial_velocity_err),
-            V_magnitude: Some(v_magnitude),
-            variability_flag: match variability_flag.parse::<usize>() {
-                Ok(x) => Some(x),
-                Err(_) => None,
-            },
-            spectral_type: Some(spectral_type.to_string()),
-            BV_magnitude: Some(bv_magnitude),
-            multiplicity_flag: Some(multiplicity_flag.to_string()),
-            CCDM_id: Some(ccdm_id.to_string()),
-            HD_id: Some(hd_id.try_into().unwrap()),
-            Yale_id: Some(yale_id.try_into().unwrap()),
-            Bayer_id: Some(bayer_id.to_string()),
-            Flamsteed_id: Some(flamsteed_id.to_string()),
-            proper_name: Some(proper_name.to_string()),
-            constellation: Some(constellation.to_string()),
-            provenence: Some(provenence.to_string()),
-        },
-    ))
 }
 
 /**
@@ -184,7 +43,7 @@ From the [original source](https://github.com/johanley/star-catalog/tree/master/
 #[derive(Debug, Clone)]
 pub struct OSBSCStar {
     /// 01: Hipparcos identifier HIP \[1,6\]
-    pub Hipparcos_id: Option<usize>,
+    pub Hipparcos_id: Field<usize>,
 
     /** 02: right Ascension in hours minutes seconds, ICRS \[9,16\]
 
@@ -192,7 +51,7 @@ pub struct OSBSCStar {
     - An underscore is used to separate the parts.
     - Calculated from the radians in field 04. Included for convenience.
     */
-    pub right_ascension_hms: Option<crate::angle::Hms>,
+    pub right_ascension_hms: Field<crate::angle::Hms>,
 
     /** 03: declination degrees minutes seconds, ICRS \[27,16\]
 
@@ -200,202 +59,440 @@ pub struct OSBSCStar {
     - An underscore is used to separate the parts.
     - Calculated from the radians in field 05. Included for convenience.
     */
-    pub declination_dms: Option<crate::angle::Dms>,
+    pub declination_dms: Field<crate::angle::Dms>,
 
     /** 04: right ascension in radians, ICRS. \[45,12\]
 
     - Proper motion epoch is J1991.25
     */
-    pub right_ascension_rad: Option<f64>,
+    pub right_ascension_rad: Field<f64>,
 
     /** 05: declination in radians, ICRS.  \[59,13\]
 
     - Proper motion epoch is J1991.25
     */
-    pub declination_rad: Option<f64>,
+    pub declination_rad: Field<f64>,
 
     /// 06: parallax in mas \[73,7\]
-    pub parallax: Option<f64>,
+    pub parallax: Field<f64>,
 
     /// 07: proper motion in right ascension in mas/year, * cosine(declination), ICRS \[81,8\]
-    pub proper_motion_ra: Option<f64>,
+    pub proper_motion_ra: Field<f64>,
 
     /// 08: proper motion in declination in mas/year, ICRS \[90,8\]
-    pub proper_motion_dec: Option<f64>,
+    pub proper_motion_dec: Field<f64>,
 
     /// 09: radial velocity in kilometers per second \[99,7\]
-    pub radial_velocity: Option<f64>,
+    pub radial_velocity: Field<Option<f64>>,
 
     /// 10: formal error in right ascension in mas \[107,6\]
-    pub right_ascension_rad_err: Option<f64>,
+    pub right_ascension_rad_err: Field<Option<f64>>,
 
     /// 11: formal error in declination in mas \[114,6\]
-    pub declination_rad_err: Option<f64>,
+    pub declination_rad_err: Field<Option<f64>>,
 
     /// 12: formal error in parallax in mas \[121,6\]
-    pub parallax_err: Option<f64>,
+    pub parallax_err: Field<f64>,
 
     /// 13: formal error in proper motion in right ascension in mas/year \[128,6\]
-    pub proper_motion_ra_err: Option<f64>,
+    pub proper_motion_ra_err: Field<f64>,
 
     /// 14: formal error in proper motion in declination in mas/year \[135,6\]
-    pub proper_motion_dec_err: Option<f64>,
+    pub proper_motion_dec_err: Field<f64>,
 
     /// 15: formal error in radial velocity in kilometers per second \[142,5\]
-    pub radial_velocity_err: Option<f64>,
+    pub radial_velocity_err: Field<Option<f64>>,
 
     /// 16: magnitude in the Johnson V band \[148,5\]
-    pub V_magnitude: Option<f64>,
+    pub V_magnitude: Field<f64>,
 
     /** 17: coarse variability flag \[154,1\]
 
     - Hipparcos-1 field H6.
     - 1: < 0.06mag ; 2: 0.06-0.6mag ; 3: >0.6mag
     */
-    pub variability_flag: Option<usize>,
+    pub variability_flag: Field<Option<usize>>,
 
     /// 18: spectral type \[156,12\]
-    pub spectral_type: Option<String>,
+    pub spectral_type: Field<String>,
 
     /// 29: color index Johnson B-V magnitude \[169,6\]
-    pub BV_magnitude: Option<f64>,
+    pub BV_magnitude: Field<Option<f64>>,
 
     /** 20: multiplicity flag \[176,1\]
 
     - Hipparcos-1 H59, only for C values.
     */
-    pub multiplicity_flag: Option<String>,
+    pub multiplicity_flag: Field<String>,
 
     /** 21: CCDM identifier \[178,10\]
 
     - A catalog of double/multiple stars.
     */
-    pub CCDM_id: Option<String>,
+    pub CCDM_id: Field<String>,
 
     /** 22: HD identifier \[189,6\]
 
     - Henry Draper catalog.
     */
-    pub HD_id: Option<usize>,
+    pub HD_id: Field<Option<usize>>,
 
     /** 23: HR identifier \[196,4\]
 
     - Yale Bright Star Catalog, r5.
     */
-    pub Yale_id: Option<usize>,
+    pub Yale_id: Field<Option<usize>>,
 
     /// 24: Bayer identifier \[201,7\]
-    pub Bayer_id: Option<String>,
+    pub Bayer_id: Field<String>,
 
     /// 25: Flamsteed identifier \[209,7\]
-    pub Flamsteed_id: Option<String>,
+    pub Flamsteed_id: Field<String>,
 
     /** 26: proper name \[217,14\]
 
     - From an internal list defined by OSBSC.
     */
-    pub proper_name: Option<String>,
+    pub proper_name: Field<String>,
 
     /// 27: Constellation abbreviation \[232,3\]
-    pub constellation: Option<String>,
-
-    /** 28: provenance string for all fields (except for the provenance itself, of course) \[236,27\]
-    Each field (other than this one) has a provenance.
-    The provenance string is an ordered string of single letters, stating the provenance of each field in the given record, in order from left to right.
-
-    - A: Primary source for astrometry -  Hipparcos2
-    - B: Secondary source for astrometry - Hipparcos1
-    - C: Primary source for radial velocities - Pulkovo
-    - D: Secondary source for radial velocities - BF
-    - E: Identifiers: Bayer, Flamsteed, and HR - Yale Bright Star Catalog
-    - F: Backfill for a small number of items - SIMBAD
-    - G: My own custom data for star names
-    - H: Sexagesimal versions of RA, DEC - calculated fields
-    - I: Vmag is the maximum (brightest) magnitude in the Hipparcos Variability Annex
-    - \-: Blank fields have no provenance
-    */
-    pub provenence: Option<String>,
+    pub constellation: Field<String>,
 }
 
-impl TryFrom<String> for OSBSCStar {
+/// Provenance of data
+#[derive(Debug, Clone, Copy, Eq, Hash, PartialEq)]
+pub enum Provenance {
+    /// Primary source for astrometry -  Hipparcos2
+    Hipparcos2,
+    /// Secondary source for astrometry - Hipparcos1
+    Hipparcos1,
+    /// Primary source for radial velocities - Pulkovo
+    Pulvoko,
+    /// Secondary source for radial velocities - BF
+    BF,
+    /// Identifiers: Bayer, Flamsteed, and HR - Yale Bright Star Catalog
+    Yale,
+    /// Backfill for a small number of items - SIMBAD
+    SIMBAD,
+    /// Open Source Bright Star Catalog custom data for star names
+    Custom,
+    /// Sexagesimal versions of RA, DEC - calculated fields
+    Calculated,
+    /// Vmag is the maximum (brightest) magnitude in the Hipparcos Variability Annex
+    HipparcosVariabilityAnnex,
+    /// Blank fields have no provenance
+    None,
+}
+
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
+pub struct Field<T> {
+    value: T,
+    provenance: Provenance,
+}
+
+pub fn provenance(input: &str) -> IResult<&str, Provenance> {
+    let (input, prov) = one_of("ABCDEFGHI-")(input)?;
+
+    Ok((
+        input,
+        match prov {
+            'A' => Provenance::Hipparcos1,
+            'B' => Provenance::Hipparcos2,
+            'C' => Provenance::Pulvoko,
+            'D' => Provenance::BF,
+            'E' => Provenance::Yale,
+            'F' => Provenance::SIMBAD,
+            'G' => Provenance::Custom,
+            'H' => Provenance::Calculated,
+            'I' => Provenance::HipparcosVariabilityAnnex,
+            '-' => Provenance::None,
+            _ => unreachable!(),
+        },
+    ))
+}
+
+/// Parse a record from OS Bright Star Catalog data file.
+pub fn parse_record(input: &str) -> IResult<&str, OSBSCStar> {
+    let (input, hipparcos_id) = map_parser(take(8usize), ws(u32))(input)?;
+
+    let (input, right_ascension_hms) =
+        map_parser(take(18usize), ws(sexagesimal_underscore))(input)?;
+
+    let (input, declination_dms) = map_parser(take(18usize), ws(sexagesimal_underscore))(input)?;
+
+    let (input, right_ascension_rad) = map_parser(take(14usize), ws(double))(input)?;
+
+    let (input, declination_rad) = map_parser(take(14usize), ws(double))(input)?;
+
+    let (input, parallax) = map_parser(take(8usize), ws(double))(input)?;
+
+    let (input, proper_motion_ra) = map_parser(take(9usize), ws(double))(input)?;
+
+    let (input, proper_motion_dec) = map_parser(take(9usize), ws(double))(input)?;
+
+    let (input, radial_velocity) = take(8usize)(input)?;
+
+    let (input, right_ascension_rad_err) = take(7usize)(input)?;
+
+    let (input, declination_rad_err) = take(7usize)(input)?;
+
+    let (input, parallax_err) = map_parser(take(7usize), ws(double))(input)?;
+
+    let (input, proper_motion_ra_err) = map_parser(take(7usize), ws(double))(input)?;
+
+    let (input, proper_motion_dec_err) = map_parser(take(7usize), ws(double))(input)?;
+
+    let (input, radial_velocity_err) = take(6usize)(input)?;
+
+    let (input, v_magnitude) = map_parser(take(6usize), ws(double))(input)?;
+
+    let (input, variability_flag) = map_parser(take(2usize), one_of(" 123"))(input)?;
+
+    let (input, spectral_type) = take(13usize)(input)?;
+
+    let (input, bv_magnitude) = take(7usize)(input)?;
+
+    let (input, multiplicity_flag) = take(2usize)(input)?;
+
+    let (input, ccdm_id) = take(11usize)(input)?;
+
+    let (input, hd_id) = take(7usize)(input)?;
+
+    let (input, yale_id) = take(5usize)(input)?;
+
+    let (input, bayer_id) = take(8usize)(input)?;
+
+    let (input, flamsteed_id) = take(8usize)(input)?;
+
+    let (input, proper_name) = take(15usize)(input)?;
+
+    let (input, constellation) = take(4usize)(input)?;
+
+    let (input, provs) = all_consuming(terminated(
+        map_parser(take(27usize), many1(provenance)),
+        multispace0,
+    ))(input)?;
+
+    Ok((
+        input,
+        OSBSCStar {
+            Hipparcos_id: Field {
+                value: hipparcos_id.try_into().unwrap(),
+                provenance: provs[0],
+            },
+
+            right_ascension_hms: Field {
+                value: Hms::new(
+                    Sign::from(right_ascension_hms.major),
+                    right_ascension_hms.major.unsigned_abs(),
+                    right_ascension_hms.minor.unsigned_abs(),
+                    right_ascension_hms.second,
+                ),
+                provenance: provs[1],
+            },
+            declination_dms: Field {
+                value: Dms(
+                    Sign::from(declination_dms.major),
+                    declination_dms.major.unsigned_abs(),
+                    declination_dms.minor.unsigned_abs(),
+                    declination_dms.second,
+                ),
+                provenance: provs[2],
+            },
+            right_ascension_rad: Field {
+                value: right_ascension_rad,
+                provenance: provs[3],
+            },
+            declination_rad: Field {
+                value: declination_rad,
+                provenance: provs[4],
+            },
+            parallax: Field {
+                value: parallax,
+                provenance: provs[5],
+            },
+            proper_motion_ra: Field {
+                value: proper_motion_ra,
+                provenance: provs[6],
+            },
+            proper_motion_dec: Field {
+                value: proper_motion_dec,
+                provenance: provs[7],
+            },
+            radial_velocity: Field {
+                value: match radial_velocity.trim().parse::<f64>() {
+                    Ok(x) => Some(x),
+                    Err(_) => None,
+                },
+                provenance: provs[8],
+            },
+            right_ascension_rad_err: Field {
+                value: match right_ascension_rad_err.trim().parse::<f64>() {
+                    Ok(x) => Some(x),
+                    Err(_) => None,
+                },
+                provenance: provs[9],
+            },
+            declination_rad_err: Field {
+                value: match declination_rad_err.trim().parse::<f64>() {
+                    Ok(x) => Some(x),
+                    Err(_) => None,
+                },
+                provenance: provs[10],
+            },
+            parallax_err: Field {
+                value: parallax_err,
+                provenance: provs[11],
+            },
+            proper_motion_ra_err: Field {
+                value: proper_motion_ra_err,
+                provenance: provs[12],
+            },
+            proper_motion_dec_err: Field {
+                value: proper_motion_dec_err,
+                provenance: provs[13],
+            },
+            radial_velocity_err: Field {
+                value: match radial_velocity_err.trim().parse::<f64>() {
+                    Ok(x) => Some(x),
+                    Err(_) => None,
+                },
+                provenance: provs[14],
+            },
+            V_magnitude: Field {
+                value: v_magnitude,
+                provenance: provs[15],
+            },
+            variability_flag: Field {
+                value: match variability_flag {
+                    '1' => Some(1usize),
+                    '2' => Some(2usize),
+                    '3' => Some(3usize),
+                    _ => None,
+                },
+                provenance: provs[16],
+            },
+            spectral_type: Field {
+                value: spectral_type.trim().to_string(),
+                provenance: provs[17],
+            },
+            BV_magnitude: Field {
+                value: match bv_magnitude.trim().parse::<f64>() {
+                    Ok(x) => Some(x),
+                    Err(_) => None,
+                },
+                provenance: provs[18],
+            },
+            multiplicity_flag: Field {
+                value: multiplicity_flag.trim().to_string(),
+                provenance: provs[19],
+            },
+            CCDM_id: Field {
+                value: ccdm_id.trim().to_string(),
+                provenance: provs[20],
+            },
+            HD_id: Field {
+                value: match hd_id.trim().parse::<usize>() {
+                    Ok(x) => Some(x),
+                    Err(_) => None,
+                },
+                provenance: provs[21],
+            },
+            Yale_id: Field {
+                value: match yale_id.trim().parse::<usize>() {
+                    Ok(x) => Some(x),
+                    Err(_) => None,
+                },
+                provenance: provs[22],
+            },
+            Bayer_id: Field {
+                value: bayer_id.trim().to_string(),
+                provenance: provs[23],
+            },
+            Flamsteed_id: Field {
+                value: flamsteed_id.trim().to_string(),
+                provenance: provs[24],
+            },
+            proper_name: Field {
+                value: proper_name.trim().to_string(),
+                provenance: provs[25],
+            },
+            constellation: Field {
+                value: constellation.trim().to_string(),
+                provenance: provs[26],
+            },
+        },
+    ))
+}
+
+impl TryFrom<&String> for OSBSCStar {
     type Error = ();
 
-    fn try_from(s: String) -> Result<Self, Self::Error> {
-        let star = Self {
-            Hipparcos_id: parse_trim!(usize, s[0..6]),
-
-            right_ascension_hms: parse_ams!(hms, s[8..24]),
-            declination_dms: parse_ams!(dms, s[26..42]),
-            right_ascension_rad: parse_trim!(f64, s[44..56]),
-            declination_rad: parse_trim!(f64, s[58..71]),
-            parallax: parse_trim!(f64, s[72..79]),
-            proper_motion_ra: parse_trim!(f64, s[80..88]),
-            proper_motion_dec: parse_trim!(f64, s[89..97]),
-            radial_velocity: parse_trim!(f64, s[98..105]),
-            right_ascension_rad_err: parse_trim!(f64, s[106..112]),
-            declination_rad_err: parse_trim!(f64, s[113..119]),
-            parallax_err: parse_trim!(f64, s[120..126]),
-            proper_motion_ra_err: parse_trim!(f64, s[127..133]),
-            proper_motion_dec_err: parse_trim!(f64, s[134..140]),
-            radial_velocity_err: parse_trim!(f64, s[141..146]),
-            V_magnitude: parse_trim!(f64, s[147..152]),
-            variability_flag: parse_trim!(usize, s[153..154]),
-            spectral_type: parse_trim!(String, s[155..167]),
-            BV_magnitude: parse_trim!(f64, s[168..174]),
-            multiplicity_flag: parse_trim!(String, s[175..176]),
-            CCDM_id: parse_trim!(String, s[177..187]),
-            HD_id: parse_trim!(usize, s[188..194]),
-            Yale_id: parse_trim!(usize, s[195..199]),
-            Bayer_id: parse_trim!(String, s[200..207]),
-            Flamsteed_id: parse_trim!(String, s[208..215]),
-            proper_name: parse_trim!(String, s[216..230]),
-            constellation: parse_trim!(String, s[231..234]),
-            provenence: parse_trim!(String, s[235..262]),
-        };
-        if star.is_valid_parse() {
-            Ok(star)
-        } else {
-            Err(())
+    fn try_from(s: &String) -> Result<Self, Self::Error> {
+        let result = parse_record(s);
+        match result {
+            Ok((_, star)) => Ok(star),
+            Err(_) => Err(()),
         }
-    }
-}
-
-impl ValidParse for OSBSCStar {
-    fn is_valid_parse(&self) -> bool {
-        self.Hipparcos_id.is_some()
-            && self.right_ascension_rad.is_some()
-            && self.declination_rad.is_some()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::catalog::osbsc::*;
-    use crate::parse_catalog;
 
     #[test]
     fn test_osbscstar_parse_record() {
-        let s = String::from("    88  00_01_04.5982692  -48_48_35.492919  0.0046977187  -0.8518927495    5.50   -18.36    -5.82     8.0   0.26   0.29   0.48   0.46   0.38   0.7  5.71          G8III  0.911              224834 9081   τ Phe                        Phe BHHAAAAACAAAAACB-BB--BEE--H ");
-        parse_record(&s).unwrap();
+        // let s = String::from("    88  00_01_04.5982692  -48_48_35.492919  0.0046977187  -0.8518927495    5.50   -18.36    -5.82     8.0   0.26   0.29   0.48   0.46   0.38   0.7  5.71          G8III  0.911              224834 9081   τ Phe                        Phe BHHAAAAACAAAAACB-BB--BEE--H ");
+        let s = String::from("   107  00_01_20.1124271  -50_20_14.636969  0.0058259401  -0.8785533522    6.01     7.88    11.40     2.3   0.21   0.20   0.32   0.25   0.24   0.9  5.53 1        M2III  1.615              224865 9082                                Phe BHHAAAAACAAAAACBBBB--BE---H ");
+        let rec = parse_record(&s);
+        println!("{:#?}", rec);
+        rec.unwrap();
+        // panic!()
     }
 
     #[test]
-    fn test_osbscstar_from() {
-        let s = String::from("    88  00_01_04.5982692  -48_48_35.492919  0.0046977187  -0.8518927495    5.50   -18.36    -5.82     8.0   0.26   0.29   0.48   0.46   0.38   0.7  5.71          G8III  0.911              224834 9081   τ Phe                        Phe BHHAAAAACAAAAACB-BB--BEE--H ");
-        OSBSCStar::try_from(s).unwrap();
-    }
-
-    #[test]
-    #[ignore]
+    // #[ignore]
     fn test_catalog() {
-        let _stars = parse_catalog!(
-            OSBSCStar,
-            Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8"),
-            // NOTE: it seems like we don't need to pad this catalog even though it has no delimiters.
-            // In case it breaks in the future: Some(262)
-            None
-        );
-        println!("Number of stars: {}", _stars.len());
-        println!("Last Star: {:?}", _stars.last().unwrap());
+        use std::error::Error;
+        use std::fs::File;
+        use std::io::prelude::*;
+        use std::io::BufReader;
+        use std::path::Path;
+
+        let path = Path::new("data/OSBSC/os-bright-star-catalog-hip.utf8");
+        let display = path.display();
+
+        // Open the path in read-only mode, returns `io::Result<File>`
+        let file = match File::open(&path) {
+            // The `description` method of `io::Error` returns a string that describes the error
+            Err(why) => panic!(
+                "couldn't open {}: {}",
+                display,
+                <dyn Error>::to_string(&why)
+            ),
+            Ok(file) => file,
+        };
+        let reader = BufReader::new(file);
+        let lines = reader.lines();
+        // lines is a instance of some type which implements Iterator<Item=&str>
+
+        let mut stars: Vec<OSBSCStar> = vec![];
+
+        for l in lines {
+            let s = l.unwrap();
+            let result = OSBSCStar::try_from(&s);
+            match result {
+                Ok(star) => stars.push(star),
+                Err(_) => {
+                    println!("{:#?}", &s);
+                    println!("{:#?}", result);
+                    panic!()
+                }
+            };
+        }
+        println!("Number of stars: {}", stars.len());
+        println!("Last Star: {:?}", stars.last().unwrap());
+        // panic!()
     }
 }
