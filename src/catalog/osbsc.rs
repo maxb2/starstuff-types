@@ -6,6 +6,7 @@
 use super::ValidParse;
 use crate::angle::{DegMinSec, HourMinSec, Sign};
 use crate::parse_trim;
+use unicode_segmentation::UnicodeSegmentation;
 
 /// Parse an arc/minute/second field.
 macro_rules! parse_ams {
@@ -192,6 +193,7 @@ impl TryFrom<String> for OSBSCStar {
     type Error = ();
 
     fn try_from(s: String) -> Result<Self, Self::Error> {
+        let g = UnicodeSegmentation::graphemes(s.as_str(), true).collect::<Vec<&str>>();
         let star = Self {
             Hipparcos_id: parse_trim!(usize, s[0..6]),
 
@@ -217,11 +219,11 @@ impl TryFrom<String> for OSBSCStar {
             CCDM_id: parse_trim!(String, s[177..187]),
             HD_id: parse_trim!(usize, s[188..194]),
             Yale_id: parse_trim!(usize, s[195..199]),
-            Bayer_id: parse_trim!(String, s[200..207]),
-            Flamsteed_id: parse_trim!(String, s[208..215]),
-            proper_name: parse_trim!(String, s[216..230]),
-            constellation: parse_trim!(String, s[231..234]),
-            provenence: parse_trim!(String, s[235..262]),
+            Bayer_id: parse_trim!(String, &g[200..207].join("").to_string()),
+            Flamsteed_id: parse_trim!(String, &g[208..215].join("").to_string()),
+            proper_name: parse_trim!(String, &g[216..230].join("").to_string()),
+            constellation: parse_trim!(String, &g[231..234].join("").to_string()),
+            provenence: parse_trim!(String, &g[235..262].join("").to_string()),
         };
         if star.is_valid_parse() {
             Ok(star)
