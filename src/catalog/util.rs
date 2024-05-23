@@ -7,7 +7,7 @@ macro_rules! parse_trim {
     (String, $s:expr) => {
         match $s.trim() {
             "" => None,
-            _ => Some($s.to_string()),
+            t => Some(t.to_string()),
         }
     };
     ($T:ty, $s:expr) => {
