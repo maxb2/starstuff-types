@@ -249,7 +249,44 @@ mod tests {
     #[test]
     fn osbscstar_from() {
         let s = String::from("    88  00_01_04.5982692  -48_48_35.492919  0.0046977187  -0.8518927495    5.50   -18.36    -5.82     8.0   0.26   0.29   0.48   0.46   0.38   0.7  5.71          G8III  0.911              224834 9081   τ Phe                        Phe BHHAAAAACAAAAACB-BB--BEE--H ");
-        OSBSCStar::try_from(s).unwrap();
+        let star = OSBSCStar::try_from(s).unwrap();
+        assert_eq!(star.Hipparcos_id.unwrap(), 88_usize);
+        assert_eq!(
+            star.right_ascension_hms.unwrap(),
+            HourMinSec(Sign::Positive, 00, 01, 04.5982692)
+        );
+        assert_eq!(
+            star.declination_dms.unwrap(),
+            DegMinSec(Sign::Negative, 48, 48, 35.492919)
+        );
+        assert_eq!(star.right_ascension_rad.unwrap(), 0.0046977187);
+        assert_eq!(star.declination_rad.unwrap(), -0.8518927495);
+        assert_eq!(star.parallax.unwrap(), 5.50);
+        assert_eq!(star.proper_motion_ra.unwrap(), -18.36);
+        assert_eq!(star.proper_motion_dec.unwrap(), -5.82);
+        assert_eq!(star.radial_velocity.unwrap(), 8.0);
+        assert_eq!(star.right_ascension_rad_err.unwrap(), 0.26);
+        assert_eq!(star.declination_rad_err.unwrap(), 0.29);
+        assert_eq!(star.parallax_err.unwrap(), 0.48);
+        assert_eq!(star.proper_motion_ra_err.unwrap(), 0.46);
+        assert_eq!(star.proper_motion_dec_err.unwrap(), 0.38);
+        assert_eq!(star.radial_velocity_err.unwrap(), 0.7);
+        assert_eq!(star.V_magnitude.unwrap(), 5.71);
+        assert!(star.variability_flag.is_none());
+        assert_eq!(star.spectral_type.unwrap(), String::from("G8III"));
+        assert_eq!(star.BV_magnitude.unwrap(), 0.911);
+        assert!(star.multiplicity_flag.is_none());
+        assert!(star.CCDM_id.is_none());
+        assert_eq!(star.HD_id.unwrap(), 224834);
+        assert_eq!(star.Yale_id.unwrap(), 9081);
+        assert_eq!(star.Bayer_id.unwrap(), String::from("τ Phe"));
+        assert!(star.Flamsteed_id.is_none());
+        assert!(star.proper_name.is_none());
+        assert_eq!(star.constellation.unwrap(), String::from("Phe"));
+        assert_eq!(
+            star.provenence.unwrap(),
+            String::from("BHHAAAAACAAAAACB-BB--BEE--H")
+        );
     }
 
     #[test]
